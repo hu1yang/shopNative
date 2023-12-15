@@ -1,0 +1,43 @@
+dependencies: \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTInteropTurboModule.mm \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Target\ Support\ Files/React-NativeModulesApple/React-NativeModulesApple-prefix.pch \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTInteropTurboModule.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/ReactCommon/ReactCommon/TurboModule.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-jsi/jsi/jsi.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-jsi/jsi/jsi-inl.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-callinvoker/ReactCommon/CallInvoker.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-callinvoker/ReactCommon/SchedulerPriority.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios/ReactCommon/RCTTurboModule.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBridge.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBridgeDelegate.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTJavaScriptLoader.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTDefines.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTInspectorDevServerHelper.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTPackagerConnection.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBridgeModule.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTJSThread.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBundleManager.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBridgeModuleDecorator.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTFrameUpdate.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTInvalidating.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBridgeConstants.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTConstants.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTModuleMethod.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBridgeMethod.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTNullability.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTAssert.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTConvert.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTAnimationType.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBorderCurve.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTBorderStyle.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTLog.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTUtils.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTPointerEvents.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTTextDecorationLineType.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/Yoga/yoga/Yoga.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/Yoga/yoga/YGEnums.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/Yoga/yoga/YGMacros.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/Yoga/yoga/YGValue.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTCxxConvert.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTManagedPointer.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Public/React-Core/React/RCTParserUtils.h

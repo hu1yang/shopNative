@@ -1,0 +1,36 @@
+dependencies: \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/yoga/yoga/algorithm/Baseline.cpp \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Target\ Support\ Files/Yoga/Yoga-prefix.pch \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/yoga/yoga/Yoga.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/yoga/yoga/YGEnums.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/yoga/yoga/YGMacros.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/node_modules/react-native/ReactCommon/yoga/yoga/YGValue.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/algorithm/Align.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/algorithm/FlexDirection.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/debug/AssertFatal.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/config/Config.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/Errata.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/YogaEnums.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/ExperimentalFeature.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/LogLevel.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/node/Node.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/Direction.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/MeasureMode.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/NodeType.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/node/LayoutResults.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/bits/NumericBitfield.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/node/CachedMeasurement.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/numeric/Comparison.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/numeric/FloatOptional.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/style/CompactValue.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/bits/BitCast.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/style/Style.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/Align.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/Display.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/FlexDirection.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/Justify.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/Overflow.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/PositionType.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/enums/Wrap.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/algorithm/Baseline.h \
+  /Users/hujun/Documents/learn/reactNative/shopNative/ios/Pods/Headers/Private/Yoga/yoga/event/event.h
