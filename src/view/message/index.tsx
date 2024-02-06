@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     },
     messageInfomationTime: {
         fontSize: 11,
-        fontWeight: 400,
+        fontWeight: '400',
         color: '#ccc'
     },
     messageInfomationCeek: {
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
         height: 15,
         borderRadius: 15,
         backgroundColor: 'rgba(249, 76, 76, 1)',
-        flexWrap: 0,
+        flexWrap: 'wrap',
         padding: 2
     }
 })
@@ -265,7 +265,6 @@ const Message = () => {
         }, 2000); // 假设刷新操作需要2秒完成
     }
     const onEndReachedMessage = () => {
-        console.log(isLoading , refreshing);
         if (!isLoading && !refreshing) {
             setIsLoading(true)
             setTimeout(() => {
@@ -290,7 +289,7 @@ const Message = () => {
                                 link:string;
                             },ids:number) => <View style={styles.tab} key={`ref${ids}`}>
                                     <Image style={{width: 35,height: 35}} src={its.src}></Image>
-                                    <Text style={{fontSize: 12,fontWeight: 400,fontSize: 13 ,marginTop: 10}} numberOfLines={1}>{its.name}</Text>
+                                    <Text style={{fontSize: 12,fontWeight: '400' ,marginTop: 10}} numberOfLines={1}>{its.name}</Text>
                                 </View>
                         )}
                     </View>
@@ -306,7 +305,7 @@ const Message = () => {
                             onRefresh={onRefresh}
                             ListFooterComponent={() => (
                                 <View style={{ padding: 20 }}>
-                                    {isLoading && <ActivityIndicator />}
+                                    {(isLoading && messageListData.length) ? <ActivityIndicator /> : null }
                                 </View>
                             )}
                             renderItem={({ item }) => (
@@ -320,47 +319,15 @@ const Message = () => {
                                             <Text style={styles.messageInfomationTime}>08:15</Text>
                                         </View>
                                         <View style={styles.messageInfomationCeek}>
-                                            <Text style={{fontSize: 12, fontWeight: 400,color: '#999',flex: 1}} numberOfLines={1}>{item.message}</Text>
+                                            <Text style={{fontSize: 12, fontWeight: '400',color: '#999',flex: 1}} numberOfLines={1}>{item.message}</Text>
                                             <View style={styles.messageInfomationBox}>
-                                                <Text style={{fontSize: 10,fontWeight: 400,color: '#fff'}}>{item.number}</Text>
+                                                <Text style={{fontSize: 10,fontWeight: '400',color: '#fff'}}>{item.number}</Text>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             )}
                             />
-                        {/*<ScrollView contentContainerStyle={styles.scrollBox} refreshControl={*/}
-                        {/*    <RefreshControl*/}
-                        {/*        refreshing={refreshing}*/}
-                        {/*        onRefresh={onRefresh}*/}
-                        {/*        title="下拉刷新"*/}
-                        {/*        colors={['#0087d1']} // 刷新指示器的颜色（Android）*/}
-                        {/*        tintColor="#0087d1" // 刷新指示器的颜色（iOS）*/}
-                        {/*        titleColor="#0087d1" // 刷新指示器标题的颜色（iOS）*/}
-                        {/*    />*/}
-                        {/*}>*/}
-                        {/*    {*/}
-                        {/*        messageListData.map((its,ids) => (*/}
-                        {/*            <View style={styles.messageList} key={`message${ids}`}>*/}
-                        {/*                <View style={styles.messageLogo}>*/}
-                        {/*                    <Image style={{ width: '100%', height: '100%'}} src={its.src}></Image>*/}
-                        {/*                </View>*/}
-                        {/*                <View style={styles.messageInfomation}>*/}
-                        {/*                    <View style={styles.messageInfomationHeader}>*/}
-                        {/*                        <Text style={styles.messageInfomationTitle} numberOfLines={1}>{its.title}</Text>*/}
-                        {/*                        <Text style={styles.messageInfomationTime}>08:15</Text>*/}
-                        {/*                    </View>*/}
-                        {/*                    <View style={styles.messageInfomationCeek}>*/}
-                        {/*                        <Text style={{fontSize: 12, fontWeight: 400,color: '#999',flex: 1}} numberOfLines={1}>{its.message}</Text>*/}
-                        {/*                        <View style={styles.messageInfomationBox}>*/}
-                        {/*                            <Text style={{fontSize: 10,fontWeight: 400,color: '#fff'}}>{its.number}</Text>*/}
-                        {/*                        </View>*/}
-                        {/*                    </View>*/}
-                        {/*                </View>*/}
-                        {/*            </View>*/}
-                        {/*        ))*/}
-                        {/*    }*/}
-                        {/*</ScrollView>*/}
                     </View>
                 </View>
             </View>

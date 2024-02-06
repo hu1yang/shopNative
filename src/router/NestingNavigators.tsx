@@ -5,18 +5,23 @@ import { NavigationContainer, NavigatorScreenParams, RouteProp } from "@react-na
 import {BottomTabBarButtonProps, BottomTabBarProps, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import Home from '@/view/home/Index'
-import Cart from '@/view/cart/Index'
-import Message from '@/view/message/Index'
+import Home from '@/view/home'
+import Cart from '@/view/cart'
+import Message from '@/view/message'
+import My from '@/view/my'
 
 export type MainTabParamList = {
     Home: undefined;
-    Cart:undefined
+    Cart:undefined;
+    Message:undefined;
+    My:undefined;
 };
 
 export type RootStackParamList = {
     Home:NavigatorScreenParams<MainTabParamList>;
     Cart:NavigatorScreenParams<MainTabParamList>;
+    Message:NavigatorScreenParams<MainTabParamList>;
+    My:NavigatorScreenParams<MainTabParamList>;
     Tabbar: undefined;
     // Profile:undefined;
     // Settings:undefined;
@@ -66,9 +71,10 @@ const Tabbar = (props:MainTabProps):JSX.Element => {
                     }
                 })}
             >
-                <Tab.Screen name="Message" {...props} component={Message} />
-                <Tab.Screen name="Home" {...props} component={Home} />
+                <Tab.Screen name="My" {...props} component={My} />
                 <Tab.Screen name="Cart" {...props} component={Cart} />
+                <Tab.Screen name="Home" {...props} component={Home} />
+                <Tab.Screen name="Message" {...props} component={Message} />
             </Tab.Navigator>
         </View>
     )
