@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet , View , Text , Image  , SafeAreaView , ImageBackground , ScrollView} from "react-native";
+import {StyleSheet , View , Text , Image  , SafeAreaView , ImageBackground , ScrollView } from "react-native";
 import Icon from 'react-native-vector-icons/AntDesign'
 import { Button , Badge , Divider } from '@rneui/base';
 import Swiper from 'react-native-swiper';
@@ -140,15 +140,31 @@ const My = () => {
         {picture:'https://cdn.toodudu.com/uploads/2023/10/26/归集订单@2x.png',name:'归集订单',id:6},
         {picture:'https://cdn.toodudu.com/uploads/2023/10/26/我的求购@2x.png',name:'我的求购',id:7},
     ]);
-    const [dataModelIndex, setDataModelIndex] = useState(0);
-    const [goods, setGoods] = useState();
+    const [dataModelIndex, setDataModelIndex] = useState<number>(0);
+    const [goods, setGoods] = useState(goodsArr);
+    const [recommendLoad, setRecommendLoad] = useState<boolean>(true);
 
+    const getRecommendLoad = () => {
+        setTimeout(() => {
+            let newGoods = [...goods,...goodsArr]
+            setGoods(newGoods)
+            setRecommendLoad(true)
+        })
+    }
+    const onScroll = (event:any) => {
+        const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+        const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+        if (isCloseToBottom && recommendLoad) {
+            setRecommendLoad(false)
+            getRecommendLoad();
+        }
+    }
     return (
         <View style={styles.container}>
             <ImageBackground source={{uri:'https://cdn.toodudu.com/uploads/2023/10/26/mine_back.png'}} resizeMode="cover" style={styles.backImg}></ImageBackground>
             <SafeAreaView style={{flex: 1}}>
                 <View style={styles.content}>
-                    <ScrollView alwaysBounceVertical={true} contentContainerStyle={{padding:10}}>
+                    <ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} alwaysBounceVertical={true} contentContainerStyle={{padding:10}}>
                         <View style={styles.moreFnc}>
                             <Icon name='customerservice' size={17} style={styles.moreFncIcon} />
                             <Icon name='setting' size={17} style={styles.moreFncIcon} />
@@ -294,7 +310,7 @@ const My = () => {
                                 </Swiper>
                             </View>
                         </View>
-                        <Recommend goods={goodsArr} />
+                        <Recommend goods={goods} load={recommendLoad} />
                     </ScrollView>
                 </View>
             </SafeAreaView>

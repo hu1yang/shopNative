@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet} from "react-native";
+import {View, Text, StyleSheet , ActivityIndicator} from "react-native";
 import defaultStyled from '@/assets/defaultStyled'
 import Good from "@/component/good";
 
@@ -11,8 +11,12 @@ let styled = StyleSheet.create({
         marginTop:20
     }
 })
+interface Iprops{
+    goods:any[];
+    load:boolean;
+}
 
-const Recommend = ({goods}) => {
+const Recommend = ({goods,load}:Iprops) => {
     return (
         <View style={styled.recommand}>
             <View style={[defaultStyled.flex,defaultStyled.fd_row]}>
@@ -26,6 +30,10 @@ const Recommend = ({goods}) => {
                     ))
                 }
             </View>
+            {
+                load && <ActivityIndicator />
+            }
+
         </View>
     )
 }
