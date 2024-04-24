@@ -1,5 +1,5 @@
-import React,{useCallback , memo} from 'react';
-import { View, Text, StyleSheet , TouchableOpacity } from 'react-native';
+import React,{useCallback , memo , useRef} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import { ListItem , Avatar } from '@rneui/themed';
 import LinearGradient from 'react-native-linear-gradient';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -30,7 +30,6 @@ interface IProps{
     shopId:number;
 }
 const SwipeableListItem = memo(({ goodInformation , shopId , onPress, onDelete , changeStatus }:IProps) => {
-    console.log('swiper')
     const renderRightActions = () => (
         <View style={styles.rightActions}>
             <TouchableOpacity onPress={onPress} style={styles.button}>
@@ -66,75 +65,68 @@ const SwipeableListItem = memo(({ goodInformation , shopId , onPress, onDelete ,
     }
 
     return (
-        // <Swipeable renderRightActions={renderRightActions}>
-        //     <ListItem>
-        //         <ListItem.Content>
-        //             <Text>12313</Text>
-        //         </ListItem.Content>
-        //     </ListItem>
-        // </Swipeable>
-    <ListItem.Swipeable
-        rightWidth={116}
-        rightContent={renderRightActions}
-    >
-        <ListItem.CheckBox
-            checked={goodInformation.checked}
-            uncheckedIcon={
-                <View style={{
-                    width: 17,
-                    height: 17,
-                    borderRadius: 17,
-                    borderColor: '#898989',
-                    borderWidth: 1.5,
-                    backgroundColor: '#fff',
-                }}></View>
-            }
-            onPress={toggleGood}
-            checkedIcon={
-                <View style={{
-                    width: 17,
-                    height: 17,
-                    borderRadius: 17,
-                    backgroundColor: '#F71111',
-                }}>
-                    <Icon name="check" size={15}
-                          style={{color: '#fff', textAlign: 'center', lineHeight: 17}}></Icon>
-                </View>
-            }/>
-        <Avatar
-            containerStyle={{
-                shadowColor: '#e9e9e9',
-                shadowOffset: {
-                    width: 0,
-                    height: 0,
-                },
-                shadowOpacity: 0.55,
-                shadowRadius: 21,
-                borderRadius:15
-            }}
-            rounded={false}
-            size={91}
-            source={{uri: "https://cdn.toodudu.com/tdd/images/201502/thumb_img/285_thumb_G_1423526684655.jpg"}}
-        />
-        <ListItem.Content style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.jc_bt,{height:91}]}>
-            <ListItem.Title numberOfLines={2} style={{fontWeight: '400',fontSize: 11,color: '#333333'}}>{goodInformation.name}</ListItem.Title>
-            <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct,{width:'100%'}]}>
-                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_bl]}>
-                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_bl]}>
-                        <Price defaultn={1000} floatn='03'></Price>
-                        <Text style={{fontSize:12,fontWeight:'400',color:'rgba(51, 51, 51, 1)'}}>/吨</Text>
+        <ListItem.Swipeable
+            rightWidth={116}
+            rightContent={renderRightActions}
+        >
+            <ListItem.CheckBox
+                checked={goodInformation.checked}
+                uncheckedIcon={
+                    <View style={{
+                        width: 17,
+                        height: 17,
+                        borderRadius: 17,
+                        borderColor: '#898989',
+                        borderWidth: 1.5,
+                        backgroundColor: '#fff',
+                    }}></View>
+                }
+                onPress={toggleGood}
+                checkedIcon={
+                    <View style={{
+                        width: 17,
+                        height: 17,
+                        borderRadius: 17,
+                        backgroundColor: '#F71111',
+                    }}>
+                        <Icon name="check" size={15}
+                              style={{color: '#fff', textAlign: 'center', lineHeight: 17}}></Icon>
                     </View>
-                    {/*<View style={{backgroundColor:'#F71111',width:20,height:13,marginLeft:5}}>*/}
-                    {/*    <Text style={{fontSize:10,fontWeight:'bold',color:'#fff',textAlign:'center'}}>VIP</Text>*/}
-                    {/*</View>*/}
+                }/>
+            <Avatar
+                containerStyle={{
+                    shadowColor: '#e9e9e9',
+                    shadowOffset: {
+                        width: 0,
+                        height: 0,
+                    },
+                    shadowOpacity: 0.55,
+                    shadowRadius: 21,
+                    borderRadius:15
+                }}
+                rounded={false}
+                size={91}
+                source={{uri: "https://cdn.toodudu.com/tdd/images/201502/thumb_img/285_thumb_G_1423526684655.jpg"}}
+            />
+            <ListItem.Content style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.jc_bt,{height:91}]}>
+                <ListItem.Title numberOfLines={2} style={{fontWeight: '400',fontSize: 11,color: '#333333'}}>{goodInformation.name}</ListItem.Title>
+                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct,{width:'100%'}]}>
+                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_bl]}>
+                        <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_bl]}>
+                            <Price defaultn={1000} floatn='03'></Price>
+                            <Text style={{fontSize:12,fontWeight:'400',color:'rgba(51, 51, 51, 1)'}}>/吨</Text>
+                        </View>
+                        {/*<View style={{backgroundColor:'#F71111',width:20,height:13,marginLeft:5}}>*/}
+                        {/*    <Text style={{fontSize:10,fontWeight:'bold',color:'#fff',textAlign:'center'}}>VIP</Text>*/}
+                        {/*</View>*/}
+                    </View>
+                    <View>
+                        <AddAndSubtract quantity={goodInformation.unit} changeQuantity={onChangePrice}></AddAndSubtract>
+                    </View>
                 </View>
-                <View>
-                    <AddAndSubtract quantity={goodInformation.unit} changeQuantity={onChangePrice}></AddAndSubtract>
-                </View>
-            </View>
-        </ListItem.Content>
-        {/*<ListItem.Chevron />*/}
-    </ListItem.Swipeable>
+            </ListItem.Content>
+            {/*<ListItem.Chevron />*/}
+        </ListItem.Swipeable>
     );
 })
 

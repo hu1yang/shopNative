@@ -129,6 +129,9 @@ const Cart = () => {
             return prevData.map(item => {
                 if(item.id === id){
                     item.isCheck = !item.isCheck
+                    item.goods.map(good => {
+                        good.checked = item.isCheck
+                    })
                 }
                 return item
             })
@@ -155,11 +158,6 @@ const Cart = () => {
         })
     },[shopList])
 
-    const [count, setCount] = useState(1);
-    const ceshiTest = () => {
-        setCount(count+1)
-        console.log(count)
-    }
     return (
         <SafeAreaView style={{backgroundColor: '#f2f2f2',flex: 1}}>
             <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct,styles.navBar]}>
@@ -167,7 +165,7 @@ const Cart = () => {
                     {/*<Icon name='left' size={16} style={{color:'#333333',fontWeight:'400',textAlign:'left'}} />*/}
                 </View>
                 <Text style={{fontSize:16,fontWeight:'400',color:'#333'}}>购物车</Text>
-                <TouchableWithoutFeedback onPress={() => ceshiTest()}>
+                <TouchableWithoutFeedback>
                     <View style={{width:40}}>
                         <Text style={{fontSize:13,fontWeight:'400',color:'#333',textAlign:'right'}}>编辑</Text>
                     </View>

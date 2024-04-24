@@ -28,7 +28,6 @@ type IProp = {
 }
 
 export default memo(({quantity,changeQuantity}:IProp) => {
-    console.log('add')
     return (
         <View style={styles.container}>
             <Button
