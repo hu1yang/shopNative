@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet , View , Text , Image  , SafeAreaView , ImageBackground , ScrollView } from "react-native";
+import {StyleSheet , View , Text , Image  , SafeAreaView , ImageBackground , ScrollView , TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/AntDesign'
 import { Button , Badge , Divider } from '@rneui/base';
 import Swiper from 'react-native-swiper';
 import Recommend from "@/component/recommend";
+import {MainTabProps, RootStackNavigation} from "@/router/NestingNavigators";
 
 
 let goodsArr = [
@@ -129,7 +130,9 @@ const styles = StyleSheet.create({
         paddingTop:23
     },
 })
-const My = () => {
+const My = ({navigation}:{
+    navigation:RootStackNavigation
+}) => {
     const [orderFnc, setOrderFnc] = useState<{name:string;picture:string;id:number}[]>([{picture:'https://cdn.toodudu.com/2023/11/22/WrKYdVQTgo6aIeaI26QGXYvLOJZHiHR3TOr0oYSd.png',name:'待付款',id:1},{picture:'https://cdn.toodudu.com/2023/11/22/EbvVNZa7mYE8AZSSzNgqOtXEqIKbPRDYzJi2TXFG.png',name:'待发货',id:2},{picture:'https://cdn.toodudu.com/uploads/2023/10/25/组 504@3x.png',name:'待收货',id:3},{picture:'https://cdn.toodudu.com/uploads/2023/10/25/组 505@3x.png',name:'待评价',id:4},{picture:'https://cdn.toodudu.com/uploads/2023/10/25/组 506@3x.png',name:'退款/售后',id:5}]);
     const [dataModel, setDataModel] = useState<{name:string;picture:string;id:number}[]>([
         {picture:'https://cdn.toodudu.com/uploads/2023/09/06/seckill.png',name:'集采订单',id:1},
@@ -168,14 +171,18 @@ const My = () => {
                         <View style={styles.moreFnc}>
                             <Icon name='customerservice' size={17} style={styles.moreFncIcon} />
                             <Icon name='setting' size={17} style={styles.moreFncIcon} />
-                            <View style={{position:'relative'}}>
-                                <Icon name='message1' size={17} style={styles.moreFncIcon} />
-                                <Badge
-                                    status="primary"
-                                    value={10}
-                                    containerStyle={{ position: 'absolute', top: -10, left: 25 }}
-                                />
-                            </View>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('Tabbar', { screen: 'Message' })}>
+                                <View style={{position:'relative'}}>
+                                    <Icon name='message1' size={17} style={styles.moreFncIcon} />
+                                    <Badge
+                                        status="primary"
+                                        value={10}
+                                        containerStyle={{ position: 'absolute', top: -10, left: 25 }}
+                                    />
+                                </View>
+                            </TouchableOpacity>
+
                         </View>
                         <View style={styles.userBox}>
                             <View style={styles.user}>

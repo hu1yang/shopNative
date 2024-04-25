@@ -16,25 +16,22 @@ import Good from "@/view/good";
 export type MainTabParamList = {
     Home: undefined;
     Cart:undefined;
-    Message:undefined;
+    Message: undefined;
     My:undefined;
 };
 
 export type RootStackParamList = {
-    Home:NavigatorScreenParams<MainTabParamList>;
-    Cart:NavigatorScreenParams<MainTabParamList>;
-    Message:NavigatorScreenParams<MainTabParamList>;
-    My:NavigatorScreenParams<MainTabParamList>;
-    Good:NavigatorScreenParams<MainTabParamList>;
-    Tabbar: undefined;
-    // Profile:undefined;
-    // Settings:undefined;
-    // NestingNavigators:undefined;
+    Good:{
+        id:number
+    };
+    Tabbar: {
+        screen:string
+    };
 }
 export type RootStackNavigation = StackNavigationProp<RootStackParamList>;
 export interface MainTabProps {
     navigation: RootStackNavigation;
-    route: RouteProp<RootStackParamList,'Tabbar'>;
+    route: RouteProp<RootStackParamList,keyof RootStackParamList>;
 }
 
 const Stack = createStackNavigator<RootStackParamList>();
