@@ -15,6 +15,11 @@ import {
     FlatList,
     ActivityIndicator
 } from "react-native";
+import axios from '@/util/axios';
+import EncryptedStorageUtil from "@/util/storage";
+import {RootStackNavigation} from "@/router/NestingNavigators";
+import Toast from "react-native-toast-message";
+import { useRoute } from '@react-navigation/native';
 
 const { StatusBarManager } = NativeModules;
 
@@ -145,7 +150,9 @@ const styles = StyleSheet.create({
     }
 })
 
-const Message = () => {
+const Message = ({navigation}:{
+    navigation:RootStackNavigation
+}) => {
     const operate = useRef<{
         name:string;
         src:string;
@@ -172,6 +179,7 @@ const Message = () => {
             link:''
         },
     ]);
+    const route = useRoute();
 
     const [refreshing, setRefreshing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -181,95 +189,76 @@ const Message = () => {
         message:string,
         number:string
     }[]>([]);
+    const [page, setPage] = useState<{
+        current_page:number,
+        page_size:number,
+        total:number|null
+    }>({
+        current_page:1,
+        page_size:15,
+        total:null
+    });
 
     useEffect(() => {
-        loadData()
-    },[])
+        // 如果是初次加载（`route.params?.refresh` 未定义）或 `route.params?.refresh` 更新，调用 getData
+        if (!route.params?.refresh || route.params.refresh) {
+            getData();
+        }
+    }, [route.params?.refresh]);
 
-    const loadData = () => {
-        let data = [
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-            {
-                src:'https://cdn.ibisaas.com/2021/05/17/iHdsD8WEqIenINxCdaSssUzWL7vtQCtc2MghanSc.png',
-                title:'涂多多自营旗舰店',
-                message:'最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容最后一条聊天内容',
-                number:'99+'
-            },
-        ]
-        setMessageListData((prevState) => [
-            ...prevState,
-            ...data
-        ])
-        setRefreshing(false);
-        setIsLoading(false);
+    const getData  = () => {
+        axios.post('/message/index',{}).then(res => {
+            if(res.code === 200){
+                setMessageListData((prevState) => [
+                    ...prevState,
+                    ...res.data
+                ])
+                setPage({
+                    current_page:res.pagination.page,
+                    page_size:res.pagination.pageSize,
+                    total:res.pagination.total
+                })
+
+                setRefreshing(false);
+                setIsLoading(false);
+            }else if(res.code === 403){
+                Toast.show({
+                    type: 'error',  // 可以选择不同的类型，如 success, error, info
+                    position: 'top',  // 默认从顶部显示
+                    text1: 'network code:' + res.code,
+                    text2: res.msg,
+                    visibilityTime: 3000,  // Toast显示时长
+                    topOffset: 150, // 控制顶部距离，修改此值调整 Toast 显示的高度
+                    textStyle: {
+                        fontSize: 16,
+                        color: 'white', // 自定义文字颜色
+                    },
+                });
+                setTimeout(() => {
+                    navigation.navigate('Login')
+                },200)
+            }
+        }).catch(() => {
+            setRefreshing(false);
+            setIsLoading(false);
+        })
     }
+
     const onRefresh =  () => {
         setRefreshing(true);
         setIsLoading(true);
+        setPage({
+            current_page:1,
+            page_size:15,
+            total:0
+        })
         setMessageListData([])
-        setTimeout(() => {
-            loadData()
-        }, 2000); // 假设刷新操作需要2秒完成
+        getData()
     }
     const onEndReachedMessage = () => {
-        if (!isLoading && !refreshing) {
+        if (!isLoading && !refreshing && page.page * page.pageSize >= page.total) {
             setIsLoading(true)
-            setTimeout(() => {
-                loadData()
-            },2000)
+            getData()
         }
     }
 
@@ -311,17 +300,17 @@ const Message = () => {
                             renderItem={({ item }) => (
                                 <View style={styles.messageList}>
                                     <View style={styles.messageLogo}>
-                                        <Image style={{ width: '100%', height: '100%'}} src={item.src}></Image>
+                                        <Image style={{ width: '100%', height: '100%'}} src={item.room_picture}></Image>
                                     </View>
                                     <View style={styles.messageInfomation}>
                                         <View style={styles.messageInfomationHeader}>
-                                            <Text style={styles.messageInfomationTitle} numberOfLines={1}>{item.title}</Text>
+                                            <Text style={styles.messageInfomationTitle} numberOfLines={1}>{item.room_name}</Text>
                                             <Text style={styles.messageInfomationTime}>08:15</Text>
                                         </View>
                                         <View style={styles.messageInfomationCeek}>
                                             <Text style={{fontSize: 12, fontWeight: '400',color: '#999',flex: 1}} numberOfLines={1}>{item.message}</Text>
                                             <View style={styles.messageInfomationBox}>
-                                                <Text style={{fontSize: 10,fontWeight: '400',color: '#fff'}}>{item.number}</Text>
+                                                <Text style={{fontSize: 10,fontWeight: '400',color: '#fff'}}>111</Text>
                                             </View>
                                         </View>
                                     </View>

@@ -1,7 +1,8 @@
 import {StyleSheet, View , Image , Text} from 'react-native'
-import LinearGradient from 'react-native-linear-gradient';
 import defaultStyled from "@/assets/defaultStyled";
 import Price from "@/component/price";
+import GoodTips from "@/component/goodTips";
+import React from "react";
 
 let styled = StyleSheet.create({
     good:{
@@ -42,15 +43,8 @@ const Good = ({good,style}:any) => {
             <View style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.jc_bt,styled.goodDetail]}>
                 <View style={[styled.goodMame]}>
                     <Text  numberOfLines={2} ellipsizeMode="tail" style={{fontSize:13,fontWeight:'400',color:'rgba(51, 51, 51, 1)'}}>
-                        <LinearGradient
-                            colors={['rgba(250, 95, 95, 1)', 'rgba(247, 17, 17, 1)']}
-                            start={{ x: 1, y: 0 }}
-                            end={{x: 0, y: 0}}
-                            style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:50,height:15,borderRadius:3}]}>
-                            <View>
-                                <Text style={{ color: '#fff', fontSize: 10,fontWeight:'400' }}>多多超市</Text>
-                            </View>
-                        </LinearGradient>{good.name}
+                        <GoodTips name='多多超市' colors={['rgba(250, 95, 95, 1)', 'rgba(247, 17, 17, 1)']} width={50} />
+                        {good.name}
                     </Text>
                 </View>
                 <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct,styled.goodBottom]}>

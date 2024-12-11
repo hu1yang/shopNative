@@ -22,6 +22,9 @@ let defaultStyled = StyleSheet.create({
     jc_bt:{
         justifyContent:'space-between'
     },
+    jc_en:{
+        justifyContent:'space-evenly'
+    },
     ai_ct:{
         alignItems:'center',
     },

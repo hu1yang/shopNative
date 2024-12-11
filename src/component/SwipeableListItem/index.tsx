@@ -68,6 +68,7 @@ const SwipeableListItem = memo(({ goodInformation , shopId , onPress, onDelete ,
         <ListItem.Swipeable
             rightWidth={116}
             rightContent={renderRightActions}
+            leftWidth={0}
         >
             <ListItem.CheckBox
                 checked={goodInformation.checked}
