@@ -4,7 +4,6 @@ export type optionMessageProp = {
     type: number,
     roomId: number,
     sendUser: string,
-    receiveUser: string,
     createBy?: number,
     status?: number,
     messageToken?: string,

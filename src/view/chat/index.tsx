@@ -8,11 +8,7 @@ import WebSocketClient , { IWebSocketParams } from "@/util/socket";
 import {optionMessageProp} from "@/types/message";
 import EncryptedStorageUtil from "@/util/storage";
 import {IUserInfo} from "@/types/user";
-
-type messageListProps = {
-    message:any,
-    type:number
-}
+import defaultStyled from "@/assets/defaultStyled";
 
 const styles = StyleSheet.create({
     inputStyle:{
@@ -26,14 +22,20 @@ const styles = StyleSheet.create({
 const Chat = (props:MainTabProps<'Chat'>) => {
     const [chat, setChat] = useState<string>('');
     const [roomId, setRoomId] = useState<number|null>(null);
-    const [messageList, setMessageList] = useState<messageListProps[]>([]);
+    const [messageList, setMessageList] = useState<optionMessageProp[]>([]);
     const socketRef = useRef<WebSocketClient|null>(null)
+    const userInfo = useRef<IUserInfo|null>(null);
 
-    useEffect(() => {
-        if(props.route.params.roomId){
-            setRoomId(props.route.params?.roomId)
-            checkRoom(props.route.params?.roomId)
-        }
+    useEffect( () => {
+        const fetchUserInfo = async () => {
+            userInfo.current = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
+            if (props.route.params.roomId) {
+                setRoomId(props.route.params?.roomId);
+                checkRoom(props.route.params?.roomId);
+            }
+        };
+
+        fetchUserInfo();
         return () => {
             socketRef.current?.disconnect()
             socketRef.current = null
@@ -97,13 +99,12 @@ const Chat = (props:MainTabProps<'Chat'>) => {
         );
     };
     const clientSocket = async (room_id:number) => {
-        const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
-
-        if(!room_id || !userInfo) return
+        // const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
+        if(!room_id || !userInfo.current) return
 
         const params:IWebSocketParams = {
             roomId:room_id,
-            userId:userInfo.id
+            userId:userInfo.current.id
         }
         // 如果已存在连接，则直接返回
         if (socketRef.current) {
@@ -133,6 +134,7 @@ const Chat = (props:MainTabProps<'Chat'>) => {
     const receiveMessage = () => {
         if(!socketRef.current) return
         socketRef.current?.onMessage((option:optionMessageProp) => {
+            console.log(option)
             setMessageList((prevList) => [...prevList, { ...option }]);
         })
     }
@@ -142,8 +144,7 @@ const Chat = (props:MainTabProps<'Chat'>) => {
             message:chat,
             type:1,
             roomId,
-            sendUser:'胡杨',
-            receiveUser:'胡1杨',
+            sendUser:String(userInfo.current?.username),
         })
         socketRef.current?.sendMessage(option as optionMessageProp);
         setChat('');
@@ -153,7 +154,8 @@ const Chat = (props:MainTabProps<'Chat'>) => {
             {
                 messageList.map((item,index) => {
                     return (
-                        <View key={index+'---'+item.message}>
+                        <View key={index+'---'+item.message} style={defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.fd_row}>
+                            <Text>{item.sendUser}：</Text>
                             <Text>{item.message}</Text>
                         </View>
                     )
