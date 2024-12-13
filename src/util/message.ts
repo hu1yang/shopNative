@@ -1,16 +1,6 @@
 import * as CryptoJS from 'crypto-js';
+import {optionMessageProp} from "@/types/message";
 
-type optionMessageProp = {
-    id?: number,
-    message: any,
-    type: number,
-    roomId: number,
-    sendUser: string,
-    receiveUser: string,
-    createBy?: number,
-    status?: number,
-    messageToken?: string,
-}
 
 export const createMessage = (option:optionMessageProp) => {
     const createBy = new Date().getTime()

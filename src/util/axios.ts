@@ -1,58 +1,59 @@
-import axios, {
-    AxiosInstance,
-    AxiosResponse,
-    AxiosError,
-    InternalAxiosRequestConfig
-} from 'axios'
-import EncryptedStorageUtil from './storage'
+import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import EncryptedStorageUtil from './storage';
 import Toast from 'react-native-toast-message';
+import {IUserInfo} from '@/types/user';
 
-
+// 请求配置接口
 export interface IAxiosRequestConfig<D = any> extends InternalAxiosRequestConfig<D> {
     loading?: boolean;
 }
 
-// 自定义的响应数据类型
-export interface IAxiosResponse<D = any> extends AxiosResponse<D> {
-    data: {
-        code: number;
-        msg: string;
-        data?: D;
-    };
+// 分页接口
+export interface Pagination {
+    page: number;
+    pageSize: number;
+    total: number|null;
 }
 
+// 自定义响应数据格式
+export interface CustomData<D = any> {
+    code: number;
+    msg: string;
+    data?: D;
+    pagination?: Pagination;
+}
 
-const instance:AxiosInstance = axios.create({
+// Axios 响应类型
+
+const instance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:3003',
-    timeout:15000,
-    // withCredentials:true,
-    headers:{
-        Accept:'application/json',
-        post:{
-            'Content-Type':'application/x-www-form-urlencoded'
+    timeout: 15000,
+    headers: {
+        Accept: 'application/json',
+        post: {
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        'X-Requested-With':'XMLHttpRequest'
-    }
-})
+        'X-Requested-With': 'XMLHttpRequest',
+    },
+});
 
-/**
- * 如果非自定义api中的内容，403不跳转登录
- */
-const whiteList = ['']
-const whiteFilter = (base: any, url: string) => {
-    let api = url.replace(base, '')
-    return whiteList.includes(api)
-}
+// 白名单配置
+const whiteList = ['']; // 添加白名单接口路径
+const whiteFilter = (base: string, url: string): boolean => {
+    const api = url.replace(base, '');
+    return whiteList.includes(api);
+};
 
-
+// 请求拦截器
 instance.interceptors.request.use(
-    async (config:IAxiosRequestConfig) => {
+    async (config: IAxiosRequestConfig) => {
         if (config.loading) {
-            //     loading start
+            // loading start
         }
-        const userInfo = await EncryptedStorageUtil.getItem<string>('userInfo');
-        config.headers['Access-Token'] = userInfo?.token || ''
-        let date = new Date().valueOf(); // 时间戳
+        const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
+        const token = userInfo?.token;
+        config.headers['Access-Token'] = token || '';
+        const date = new Date().valueOf(); // 时间戳
         if (config.method === 'post') {
             config.data = {
                 ...config.data,
@@ -64,76 +65,87 @@ instance.interceptors.request.use(
                 ...config.params,
             };
         }
-        return config
+        return config;
     },
-    (error:AxiosError) => {
+    (error: AxiosError) => {
         return Promise.reject(error);
     }
-)
+);
 
+// 响应拦截器
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
         // loading end
         if (response.status === 200) {
-            if(response.data.code === 403){
-                if(!whiteFilter(response.config.baseURL,response.request.responseURL)){
-
-                }
-                EncryptedStorageUtil.removeItem('userInfo')
+            if (response.data.code === 403) {
+                EncryptedStorageUtil.removeItem('userInfo');
             }
-            return Promise.resolve(response.data);
-        } else {
-            return Promise.reject(response);
+            return response;
         }
+        return Promise.reject(response);
     },
     (error: AxiosError) => {
-
-        // loading end
-        // Any status codes that falls outside the range of 2xx cause this function to trigger
-        // Do something with response error
+        // 错误处理
         Toast.show({
-            type: 'error',  // 可以选择不同的类型，如 success, error, info
-            position: 'top',  // 默认从顶部显示
-            text1: 'network error',
+            type: 'error',
+            position: 'top',
+            text1: 'Network Error',
             text2: 'Interface 500 error reported!',
-            visibilityTime: 3000,  // Toast显示时长
-            topOffset: 150, // 控制顶部距离，修改此值调整 Toast 显示的高度
-            textStyle: {
-                fontSize: 16,
-                color: 'white', // 自定义文字颜色
+            visibilityTime: 3000,
+            topOffset: 150,
+            text1Style: {
+                fontSize: 14,
+                color: '#333', // 自定义文字颜色
             },
+            text2Style:{
+                fontSize: 12,
+                color: '#ccc', // 自定义文字颜色
+            }
         });
         return Promise.reject(error);
-    },
+    }
 );
 
-function get(url: string, params: any) {
-    return instance.get(url, {
-        params,
+// 请求方法封装
+function get<T>(url: string, params: any): Promise<CustomData<T>> {
+    return instance
+    .get<CustomData<T>>(url, { params })
+    .then((response) => response.data)
+    .catch((error) => {
+        console.error(error);
+        throw error;
     });
 }
-function post(url: string, params: any) {
-    return instance.post(url, params);
-}
-function doFiles(url:string, params:any){
-    let formData = new FormData()
-    formData.append('file',params)
-    formData.append('is_auth','1')
-    return new Promise((resolve, reject) => {
-        axios.post(process.env.VITE_APP_API+url, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        }).then(res => {
-            resolve(res.data)
-        })
-        .catch(err => {
-            reject(err.data)
-        })
+
+function post<T>(url: string, params: any): Promise<CustomData<T>> {
+    return instance
+    .post(url, params)
+    .then((response) => {
+        return response.data as CustomData<T>;
     })
+    .catch((error) => {
+        console.error(error);
+        throw error;
+    });
 }
+
+// 文件上传
+function doFiles(url: string, params: any): Promise<any> {
+    const formData = new FormData();
+    formData.append('file', params);
+    formData.append('is_auth', '1');
+
+    return instance
+    .post(url, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+    .then((res) => res.data)
+    .catch((err) => {
+        console.error(err);
+        throw err;
+    });
+}
+
 export default {
     get,
     post,
-    doFiles
-}
+    doFiles,
+};

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef , useState , useCallback } from "react";
+import React, { useEffect, useRef , useState } from "react";
 import {
     View,
     Text,
@@ -13,11 +13,11 @@ import {
     PixelRatio,
     RefreshControl,
     FlatList,
-    ActivityIndicator
+    ActivityIndicator,
+    TouchableOpacity
 } from "react-native";
-import axios from '@/util/axios';
-import EncryptedStorageUtil from "@/util/storage";
-import {RootStackNavigation} from "@/router/NestingNavigators";
+import axios, {CustomData, Pagination} from '@/util/axios';
+import {RootStackNavigation} from "@/types/navigation";
 import Toast from "react-native-toast-message";
 import { useRoute } from '@react-navigation/native';
 
@@ -28,6 +28,16 @@ const WINDOW_HEIGHT = WINDOW_DIMENSIONS.height;
 const STATUS_BAR_HEIGHT =
     Platform.OS === 'android' ? StatusBar.currentHeight : StatusBarManager.HEIGHT;
 const pixelRatio = PixelRatio.get();
+
+type ImessageListData = {
+    room_id:number,
+    room_name:string,
+    status:number,
+    created_id:number,
+    participants:string,
+    created_by:string,
+    room_picture?:string,
+}
 
 const styles = StyleSheet.create({
     container:{
@@ -101,6 +111,10 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         borderBottomColor: '#D8D8D8',
         borderBottomWidth: 1,
+
+    },
+    messageListLast:{
+        borderBottomWidth: 0
     },
     messageLogo: {
         width: 45, height: 45,
@@ -183,45 +197,40 @@ const Message = ({navigation}:{
 
     const [refreshing, setRefreshing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [messageListData, setMessageListData] = useState<{
-        src:string,
-        title:string,
-        message:string,
-        number:string
-    }[]>([]);
-    const [page, setPage] = useState<{
-        current_page:number,
-        page_size:number,
-        total:number|null
-    }>({
-        current_page:1,
-        page_size:15,
+    const [messageListData, setMessageListData] = useState<ImessageListData[]>([]);
+    const [page, setPage] = useState<Pagination>({
+        page:1,
+        pageSize:15,
         total:null
     });
 
     useEffect(() => {
-        // 如果是初次加载（`route.params?.refresh` 未定义）或 `route.params?.refresh` 更新，调用 getData
-        if (!route.params?.refresh || route.params.refresh) {
-            getData();
-        }
-    }, [route.params?.refresh]);
+        console.log('进入message')
+        setMessageListData([])
+        setRefreshing(false);
+        setIsLoading(true);
+        getData();
+    }, []);
 
     const getData  = () => {
-        axios.post('/message/index',{}).then(res => {
+        axios.post<ImessageListData[]>('/message/room/index',{}).then(res => {
             if(res.code === 200){
                 setMessageListData((prevState) => [
                     ...prevState,
                     ...res.data
                 ])
-                setPage({
-                    current_page:res.pagination.page,
-                    page_size:res.pagination.pageSize,
-                    total:res.pagination.total
-                })
-
+                if(res.pagination){
+                    setPage({
+                        page:res.pagination.page,
+                        pageSize:res.pagination.pageSize,
+                        total:res.pagination.total
+                    })
+                }
                 setRefreshing(false);
                 setIsLoading(false);
             }else if(res.code === 403){
+                setRefreshing(false);
+                setIsLoading(true);
                 Toast.show({
                     type: 'error',  // 可以选择不同的类型，如 success, error, info
                     position: 'top',  // 默认从顶部显示
@@ -229,10 +238,14 @@ const Message = ({navigation}:{
                     text2: res.msg,
                     visibilityTime: 3000,  // Toast显示时长
                     topOffset: 150, // 控制顶部距离，修改此值调整 Toast 显示的高度
-                    textStyle: {
-                        fontSize: 16,
-                        color: 'white', // 自定义文字颜色
+                    text1Style: {
+                        fontSize: 14,
+                        color: '#333', // 自定义文字颜色
                     },
+                    text2Style:{
+                        fontSize: 12,
+                        color: '#ccc', // 自定义文字颜色
+                    }
                 });
                 setTimeout(() => {
                     navigation.navigate('Login')
@@ -248,15 +261,16 @@ const Message = ({navigation}:{
         setRefreshing(true);
         setIsLoading(true);
         setPage({
-            current_page:1,
-            page_size:15,
+            page:1,
+            pageSize:15,
             total:0
         })
         setMessageListData([])
         getData()
     }
     const onEndReachedMessage = () => {
-        if (!isLoading && !refreshing && page.page * page.pageSize >= page.total) {
+        if(!page.total) return
+        if (!isLoading && !refreshing && (page.page * page.pageSize) < page?.total) {
             setIsLoading(true)
             getData()
         }
@@ -285,38 +299,48 @@ const Message = ({navigation}:{
                 </View>
                 <View style={styles.message}>
                     <View style={styles.messageBox}>
-                        <FlatList
-                            data={messageListData}
-                            keyExtractor={(item, index) => index.toString()}
-                            onEndReachedThreshold={0.1}
-                            onEndReached={onEndReachedMessage}
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                            ListFooterComponent={() => (
-                                <View style={{ padding: 20 }}>
-                                    {(isLoading && messageListData.length) ? <ActivityIndicator /> : null }
-                                </View>
-                            )}
-                            renderItem={({ item }) => (
-                                <View style={styles.messageList}>
-                                    <View style={styles.messageLogo}>
-                                        <Image style={{ width: '100%', height: '100%'}} src={item.room_picture}></Image>
-                                    </View>
-                                    <View style={styles.messageInfomation}>
-                                        <View style={styles.messageInfomationHeader}>
-                                            <Text style={styles.messageInfomationTitle} numberOfLines={1}>{item.room_name}</Text>
-                                            <Text style={styles.messageInfomationTime}>08:15</Text>
+
+                        {
+                            messageListData.length ?
+
+                                <FlatList
+                                    data={messageListData}
+                                    keyExtractor={(item, index) => item.room_id.toString()}
+                                    onEndReachedThreshold={0.1}
+                                    onEndReached={onEndReachedMessage}
+                                    refreshing={refreshing}
+                                    onRefresh={onRefresh}
+                                    ListFooterComponent={() => (
+                                        <View style={{ padding: 20 }}>
+                                            {(isLoading && messageListData.length) ? <ActivityIndicator /> : null }
                                         </View>
-                                        <View style={styles.messageInfomationCeek}>
-                                            <Text style={{fontSize: 12, fontWeight: '400',color: '#999',flex: 1}} numberOfLines={1}>{item.message}</Text>
-                                            <View style={styles.messageInfomationBox}>
-                                                <Text style={{fontSize: 10,fontWeight: '400',color: '#fff'}}>111</Text>
+                                    )}
+                                    renderItem={({ item ,index }) => (
+                                        <TouchableOpacity onPress={() => {navigation.navigate('Chat', {
+                                            roomId: item.room_id
+                                        })}}>
+                                            <View style={[styles.messageList, messageListData.length - 1 === index && styles.messageListLast ]}>
+                                                <View style={styles.messageLogo}>
+                                                    <Image style={{ width: '100%', height: '100%'}} src={item.room_picture}></Image>
+                                                </View>
+                                                <View style={styles.messageInfomation}>
+                                                    <View style={styles.messageInfomationHeader}>
+                                                        <Text style={styles.messageInfomationTitle} numberOfLines={1}>{item.room_name}</Text>
+                                                        <Text style={styles.messageInfomationTime}>08:15</Text>
+                                                    </View>
+                                                    <View style={styles.messageInfomationCeek}>
+                                                        <Text style={{fontSize: 12, fontWeight: '400',color: '#999',flex: 1}} numberOfLines={1}>这是一条写死的信息这是一条写死的信息这是一条写死的信息这是一条写死的信息这是一条写死的信息这是一条写死的信息</Text>
+                                                        <View style={styles.messageInfomationBox}>
+                                                            <Text style={{fontSize: 10,fontWeight: '400',color: '#fff'}}>12</Text>
+                                                        </View>
+                                                    </View>
+                                                </View>
                                             </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            )}
-                            />
+                                        </TouchableOpacity>
+                                    )}
+                                />
+                                : <View style={styles.noMessage}><Text style={{fontSize: 16,fontWeight: '400',color: '#999',textAlign:'center',marginTop: 60}}>暂无消息</Text></View>
+                        }
                     </View>
                 </View>
             </View>

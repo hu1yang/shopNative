@@ -7,10 +7,11 @@ import {color} from "@rneui/base";
 import {Button} from "@rneui/themed";
 import LinearGradient from "react-native-linear-gradient";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
-import axios from '@/util/axios';
+import axios, {CustomData} from '@/util/axios';
 import EncryptedStorageUtil from '@/util/storage';
-import {RootStackNavigation} from "@/router/NestingNavigators";
+import {RootStackNavigation} from '@/types/navigation';
 import Toast from 'react-native-toast-message';
+import {IUserInfo} from "@/types/user";
 
 
 
@@ -65,18 +66,55 @@ const Login = ({navigation}:{
     navigation:RootStackNavigation
 }) => {
     const insets = useSafeAreaInsets();
-    const [username, setUsername] = useState<string>('hujun');
-    const [password, setPassword] = useState<string>('Hujun1314151');
+    const [username, setUsername] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [isSecure, setIsSecure] = useState<boolean>(true);
     const [isRead, setIsRead] = useState<boolean>(false);
 
     const loginSubmit = () => {
-        if(!username || !password) return
-        axios.post('/login',{username,password}).then(async res =>  {
+        if(!username || !password){
+            Toast.show({
+                type: 'error',  // 可以选择不同的类型，如 success, error, info
+                position: 'top',  // 默认从顶部显示
+                text1: '用户名密码不能为空',
+                visibilityTime: 3000,  // Toast显示时长
+                topOffset: 150, // 控制顶部距离，修改此值调整 Toast 显示的高度
+                text1Style: {
+                    fontSize: 14,
+                    color: '#333', // 自定义文字颜色
+                },
+                text2Style:{
+                    fontSize: 12,
+                    color: '#ccc', // 自定义文字颜色
+                }
+            });
+            return
+        }
+        if(!isRead) {
+            Toast.show({
+                type: 'error',  // 可以选择不同的类型，如 success, error, info
+                position: 'top',  // 默认从顶部显示
+                text1: '请仔细阅读用户协议',
+                visibilityTime: 3000,  // Toast显示时长
+                topOffset: 150, // 控制顶部距离，修改此值调整 Toast 显示的高度
+                text1Style: {
+                    fontSize: 14,
+                    color: '#333', // 自定义文字颜色
+                },
+                text2Style:{
+                    fontSize: 12,
+                    color: '#ccc', // 自定义文字颜色
+                }
+            });
+            return
+        }
+        axios.post<IUserInfo>('/login',{username,password}).then(async res =>  {
             if(res.code === 200){
-                await EncryptedStorageUtil.setItem('userInfo',res?.data);
+                const userInfo = res.data;
+                if (userInfo){
+                    await EncryptedStorageUtil.setItem<IUserInfo>('userInfo',userInfo);
+                }
                 setTimeout(() => {
-                    navigation.setParams({ refresh: true });
                     navigation.goBack();
                 },200)
             }else if(res.code === 400){
@@ -87,10 +125,14 @@ const Login = ({navigation}:{
                     text2: res.msg,
                     visibilityTime: 3000,  // Toast显示时长
                     topOffset: 150, // 控制顶部距离，修改此值调整 Toast 显示的高度
-                    textStyle: {
-                        fontSize: 16,
-                        color: 'white', // 自定义文字颜色
+                    text1Style: {
+                        fontSize: 14,
+                        color: '#333', // 自定义文字颜色
                     },
+                    text2Style:{
+                        fontSize: 12,
+                        color: '#ccc', // 自定义文字颜色
+                    }
                 });
             }
         })
@@ -121,7 +163,7 @@ const Login = ({navigation}:{
                         />
                     </View>
                     <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,styles.formItem]}>
-                        <Icon name='lock1' size={16} style={{color: '#333',fontWeight:600}}></Icon>
+                        <Icon name='lock1' size={16} style={{color: '#333',fontWeight:'600'}}></Icon>
                         <TextInput
                             style={styles.inputStyle}
                             onChangeText={setPassword}
@@ -130,7 +172,7 @@ const Login = ({navigation}:{
                             keyboardType="default"
                             secureTextEntry={isSecure}
                         />
-                        <Icon name='eyeo' size={16} style={{color: '#333',fontWeight:600}} onPress={() => setIsSecure(!isSecure)}></Icon>
+                        <Icon name='eyeo' size={16} style={{color: '#333',fontWeight:'600'}} onPress={() => setIsSecure(!isSecure)}></Icon>
                     </View>
                     <Pressable onPress={() => setIsRead(!isRead)} style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
                         <Icon name='checkcircle' size={16} style={{color: isRead?'#0062EA':'#999' }}></Icon>
@@ -139,7 +181,7 @@ const Login = ({navigation}:{
                     <View style={{paddingHorizontal:22.5}}>
                         <Button
                             ViewComponent={LinearGradient} // Don't forget this!
-                            buttonStyle={{width:'100%',height:45,borderRadius:22,textAlign:'center',alignSelf:'center',marginTop:42}}
+                            buttonStyle={{width:'100%',height:45,borderRadius:22,alignSelf:'center',marginTop:42}}
                             linearGradientProps={{
                                 colors: ["#FF0000", "#FF7979"],
                                 start: { x: 0, y: 0.5 },
@@ -147,7 +189,7 @@ const Login = ({navigation}:{
                             }}
                             onPress={loginSubmit}
                         >
-                            <Text style={{fontSize:16,fontWeight:600,color: '#FFFFFF'}}>登 录</Text>
+                            <Text style={{fontSize:16,fontWeight:'600',color: '#FFFFFF'}}>登 录</Text>
                         </Button>
 
                     </View>
