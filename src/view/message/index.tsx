@@ -20,6 +20,10 @@ import axios, {CustomData, Pagination} from '@/util/axios';
 import {RootStackNavigation} from "@/types/navigation";
 import Toast from "react-native-toast-message";
 import { useRoute } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import {IUserInfo} from "@/types/user";
+import { ImessageListData } from "@/types/message";
+
 
 const { StatusBarManager } = NativeModules;
 
@@ -29,15 +33,7 @@ const STATUS_BAR_HEIGHT =
     Platform.OS === 'android' ? StatusBar.currentHeight : StatusBarManager.HEIGHT;
 const pixelRatio = PixelRatio.get();
 
-type ImessageListData = {
-    room_id:number,
-    room_name:string,
-    status:number,
-    created_id:number,
-    participants:string,
-    created_by:string,
-    room_picture?:string,
-}
+
 
 const styles = StyleSheet.create({
     container:{
@@ -204,8 +200,8 @@ const Message = ({navigation}:{
         total:null
     });
 
+
     useEffect(() => {
-        console.log('进入message')
         setMessageListData([])
         setRefreshing(false);
         setIsLoading(true);
@@ -214,10 +210,11 @@ const Message = ({navigation}:{
 
     const getData  = () => {
         axios.post<ImessageListData[]>('/message/room/index',{}).then(res => {
+
             if(res.code === 200){
                 setMessageListData((prevState) => [
-                    ...prevState,
-                    ...res.data
+                    ...(prevState || []), // 确保 prevState 是数组
+                    ...(Array.isArray(res.data) ? res.data : []) // 确保 res.data 是数组
                 ])
                 if(res.pagination){
                     setPage({
@@ -339,7 +336,7 @@ const Message = ({navigation}:{
                                         </TouchableOpacity>
                                     )}
                                 />
-                                : <View style={styles.noMessage}><Text style={{fontSize: 16,fontWeight: '400',color: '#999',textAlign:'center',marginTop: 60}}>暂无消息</Text></View>
+                                : <View><Text style={{fontSize: 16,fontWeight: '400',color: '#999',textAlign:'center',marginTop: 60}}>暂无消息</Text></View>
                         }
                     </View>
                 </View>

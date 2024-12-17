@@ -50,8 +50,13 @@ instance.interceptors.request.use(
         if (config.loading) {
             // loading start
         }
-        const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
-        const token = userInfo?.token;
+        let token = ''
+        try {
+            const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
+            token = userInfo.token;
+        } catch (error) {
+            token = ''
+        }
         config.headers['Access-Token'] = token || '';
         const date = new Date().valueOf(); // 时间戳
         if (config.method === 'post') {

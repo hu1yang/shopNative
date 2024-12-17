@@ -6,6 +6,7 @@
  */
 
 import React from "react";
+import { Provider } from 'react-redux';
 import {
     SafeAreaView,
     ScrollView,
@@ -18,8 +19,7 @@ import {
     Colors
 } from "react-native/Libraries/NewAppScreen";
 import NestingNavigators from "@/router/NestingNavigators";
-
-
+import { store } from "@/store";
 
 
 function App(): React.JSX.Element {
@@ -30,7 +30,9 @@ function App(): React.JSX.Element {
     };
 
     return (
-        <NestingNavigators />
+        <Provider store={store}>
+            <NestingNavigators />
+        </Provider>
     );
 }
 
