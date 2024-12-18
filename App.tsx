@@ -13,6 +13,7 @@ import {
     StatusBar,
     useColorScheme,
     Text,
+    View
 } from "react-native";
 
 import {

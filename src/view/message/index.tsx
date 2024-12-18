@@ -7,10 +7,9 @@ import {
     SafeAreaView,
     ScrollView,
     Dimensions,
-    NativeModules,
+    StatusBarManager,
     StatusBar,
     Platform,
-    PixelRatio,
     RefreshControl,
     FlatList,
     ActivityIndicator,
@@ -25,13 +24,13 @@ import {IUserInfo} from "@/types/user";
 import { ImessageListData } from "@/types/message";
 
 
-const { StatusBarManager } = NativeModules;
 
 const WINDOW_DIMENSIONS = Dimensions.get('window');
 const WINDOW_HEIGHT = WINDOW_DIMENSIONS.height;
 const STATUS_BAR_HEIGHT =
-    Platform.OS === 'android' ? StatusBar.currentHeight : StatusBarManager.HEIGHT;
-const pixelRatio = PixelRatio.get();
+    Platform.OS === 'android'
+        ? StatusBar.currentHeight || 0  // 在 Android 上也可能没有正确值
+        : StatusBarManager?.HEIGHT || 0;  // 使用可选链和默认值，避免 null 错误
 
 
 
