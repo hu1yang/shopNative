@@ -4,34 +4,19 @@ import {
     Text,
     StyleSheet,
     Image,
-    SafeAreaView,
-    ScrollView,
-    Dimensions,
-    StatusBarManager,
-    StatusBar,
-    Platform,
-    RefreshControl,
     FlatList,
     ActivityIndicator,
+    RefreshControl,
     TouchableOpacity
 } from "react-native";
-import axios, {CustomData, Pagination} from '@/util/axios';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import axios, { Pagination} from '@/util/axios';
 import {RootStackNavigation} from "@/types/navigation";
 import Toast from "react-native-toast-message";
-import { useRoute } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
-import {IUserInfo} from "@/types/user";
 import { ImessageListData } from "@/types/message";
-
-
-
-const WINDOW_DIMENSIONS = Dimensions.get('window');
-const WINDOW_HEIGHT = WINDOW_DIMENSIONS.height;
-const STATUS_BAR_HEIGHT =
-    Platform.OS === 'android'
-        ? StatusBar.currentHeight || 0  // 在 Android 上也可能没有正确值
-        : StatusBarManager?.HEIGHT || 0;  // 使用可选链和默认值，避免 null 错误
-
+import { useSelector , useDispatch } from "react-redux";
+import {RootState} from "@/store";
+import {setRoom} from "@/store/actions/message";
 
 
 const styles = StyleSheet.create({
@@ -39,6 +24,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         overflow: 'hidden',
+        display: 'flex',
     },
     headerTabs:{
         backgroundColor: 'rgba(248, 248, 248, 1)'
@@ -82,7 +68,8 @@ const styles = StyleSheet.create({
     },
     message: {
         width: '100%',
-        height: WINDOW_HEIGHT-STATUS_BAR_HEIGHT-44-95-98,
+        height: 0,
+        flex:1,
         backgroundColor: 'rgba(248, 248, 248, 1)'
     },
     messageBox:{
@@ -188,33 +175,34 @@ const Message = ({navigation}:{
             link:''
         },
     ]);
-    const route = useRoute();
 
     const [refreshing, setRefreshing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [messageListData, setMessageListData] = useState<ImessageListData[]>([]);
     const [page, setPage] = useState<Pagination>({
         page:1,
         pageSize:15,
         total:null
     });
 
+    const dispatch = useDispatch();
+    const isLogin:Boolean = useSelector((state:RootState) => state.user.isLogin)
+    const messageListData:ImessageListData[] = useSelector((state:RootState) => state.message.roomList)
+
 
     useEffect(() => {
-        setMessageListData([])
-        setRefreshing(false);
-        setIsLoading(true);
-        getData();
-    }, []);
+        if(!messageListData.length){
+            setRefreshing(false);
+            setIsLoading(true);
+            getData();
+        }
+    }, [isLogin]);
 
     const getData  = () => {
         axios.post<ImessageListData[]>('/message/room/index',{}).then(res => {
-
             if(res.code === 200){
-                setMessageListData((prevState) => [
-                    ...(prevState || []), // 确保 prevState 是数组
-                    ...(Array.isArray(res.data) ? res.data : []) // 确保 res.data 是数组
-                ])
+                if(res.data.length > 0){
+                    dispatch(setRoom(res.data))
+                }
                 if(res.pagination){
                     setPage({
                         page:res.pagination.page,
@@ -261,7 +249,7 @@ const Message = ({navigation}:{
             pageSize:15,
             total:0
         })
-        setMessageListData([])
+        dispatch(setRoom([]))
         getData()
     }
     const onEndReachedMessage = () => {
@@ -274,73 +262,80 @@ const Message = ({navigation}:{
 
 
     return (
-        <SafeAreaView style={{backgroundColor: 'rgba(255, 255, 255, 1)',flex: 1}}>
-            <View style={styles.container}>
-                <View style={styles.headerTabs}>
-                    <View style={styles.header}>
-                        <Text style={styles.headerText}>消息(99+)</Text>
-                        <Image style={{width:15,height: 15}} src='https://cdn.toodudu.com/uploads/2023/10/20/MasterSlicePNG29b9e38357080f0832c06975dd932928.png'></Image>
+        <SafeAreaProvider>
+            <SafeAreaView style={{backgroundColor: 'rgba(255, 255, 255, 1)',flex: 1}}>
+                <View style={styles.container}>
+                    <View style={styles.headerTabs}>
+                        <View style={styles.header}>
+                            <Text style={styles.headerText}>消息(99+)</Text>
+                            <Image style={{width:15,height: 15}} src='https://cdn.toodudu.com/uploads/2023/10/20/MasterSlicePNG29b9e38357080f0832c06975dd932928.png'></Image>
+                        </View>
+                        <View style={styles.tabs}>
+                            {operate.current.map((its:{
+                                    name:string;
+                                    src:string;
+                                    link:string;
+                                },ids:number) => <View style={styles.tab} key={`ref${ids}`}>
+                                        <Image style={{width: 35,height: 35}} src={its.src}></Image>
+                                        <Text style={{fontSize: 12,fontWeight: '400' ,marginTop: 10}} numberOfLines={1}>{its.name}</Text>
+                                    </View>
+                            )}
+                        </View>
                     </View>
-                    <View style={styles.tabs}>
-                        {operate.current.map((its:{
-                                name:string;
-                                src:string;
-                                link:string;
-                            },ids:number) => <View style={styles.tab} key={`ref${ids}`}>
-                                    <Image style={{width: 35,height: 35}} src={its.src}></Image>
-                                    <Text style={{fontSize: 12,fontWeight: '400' ,marginTop: 10}} numberOfLines={1}>{its.name}</Text>
-                                </View>
-                        )}
-                    </View>
-                </View>
-                <View style={styles.message}>
-                    <View style={styles.messageBox}>
-
-                        {
-                            messageListData.length ?
-
-                                <FlatList
-                                    data={messageListData}
-                                    keyExtractor={(item, index) => item.room_id.toString()}
-                                    onEndReachedThreshold={0.1}
-                                    onEndReached={onEndReachedMessage}
-                                    refreshing={refreshing}
-                                    onRefresh={onRefresh}
-                                    ListFooterComponent={() => (
-                                        <View style={{ padding: 20 }}>
-                                            {(isLoading && messageListData.length) ? <ActivityIndicator /> : null }
-                                        </View>
-                                    )}
-                                    renderItem={({ item ,index }) => (
-                                        <TouchableOpacity onPress={() => {navigation.navigate('Chat', {
-                                            roomId: item.room_id
-                                        })}}>
-                                            <View style={[styles.messageList, messageListData.length - 1 === index && styles.messageListLast ]}>
-                                                <View style={styles.messageLogo}>
-                                                    <Image style={{ width: '100%', height: '100%'}} src={item.room_picture}></Image>
+                    <View style={styles.message}>
+                        <View style={styles.messageBox}>
+                            <FlatList
+                                data={messageListData}
+                                keyExtractor={(item, index) => item.room_id.toString()}
+                                onEndReachedThreshold={0.1}
+                                onEndReached={onEndReachedMessage}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={refreshing}
+                                        onRefresh={onRefresh}
+                                        tintColor="blue" // 下拉刷新指示器颜色
+                                        colors={["blue", "red", "green"]} // 安卓刷新动画颜色
+                                    />
+                                }
+                                ListFooterComponent={() => (
+                                    <View style={{ padding: 20 }}>
+                                        {(isLoading && messageListData) ? <ActivityIndicator /> : null }
+                                    </View>
+                                )}
+                                renderItem={({ item ,index }) => (
+                                    <TouchableOpacity onPress={() => {navigation.navigate('Chat', {
+                                        roomId: item.room_id
+                                    })}}>
+                                        <View style={[styles.messageList, messageListData.length - 1 === index && styles.messageListLast ]}>
+                                            <View style={styles.messageLogo}>
+                                                <Image style={{ width: '100%', height: '100%'}} src={item.room_picture}></Image>
+                                            </View>
+                                            <View style={styles.messageInfomation}>
+                                                <View style={styles.messageInfomationHeader}>
+                                                    <Text style={styles.messageInfomationTitle} numberOfLines={1}>{item.room_name}</Text>
+                                                    <Text style={styles.messageInfomationTime}>08:15</Text>
                                                 </View>
-                                                <View style={styles.messageInfomation}>
-                                                    <View style={styles.messageInfomationHeader}>
-                                                        <Text style={styles.messageInfomationTitle} numberOfLines={1}>{item.room_name}</Text>
-                                                        <Text style={styles.messageInfomationTime}>08:15</Text>
-                                                    </View>
-                                                    <View style={styles.messageInfomationCeek}>
-                                                        <Text style={{fontSize: 12, fontWeight: '400',color: '#999',flex: 1}} numberOfLines={1}>这是一条写死的信息这是一条写死的信息这是一条写死的信息这是一条写死的信息这是一条写死的信息这是一条写死的信息</Text>
-                                                        <View style={styles.messageInfomationBox}>
-                                                            <Text style={{fontSize: 10,fontWeight: '400',color: '#fff'}}>12</Text>
-                                                        </View>
+                                                <View style={styles.messageInfomationCeek}>
+                                                    <Text style={{fontSize: 12, fontWeight: '400',color: '#999',flex: 1}} numberOfLines={1}>
+                                                        { item?.messages ? item.messages[item.messages.length - 1].message : '还没有信息' }
+                                                    </Text>
+                                                    <View style={styles.messageInfomationBox}>
+                                                        <Text style={{fontSize: 10,fontWeight: '400',color: '#fff'}}>12</Text>
                                                     </View>
                                                 </View>
                                             </View>
-                                        </TouchableOpacity>
-                                    )}
-                                />
-                                : <View><Text style={{fontSize: 16,fontWeight: '400',color: '#999',textAlign:'center',marginTop: 60}}>暂无消息</Text></View>
-                        }
+                                        </View>
+                                    </TouchableOpacity>
+                                )}
+                                ListEmptyComponent={
+                                    <View><Text style={{fontSize: 16,fontWeight: '400',color: '#999',textAlign:'center',marginTop: 60}}>暂无消息</Text></View>
+                                }
+                            />
+                        </View>
                     </View>
                 </View>
-            </View>
-    </SafeAreaView>
+            </SafeAreaView>
+        </SafeAreaProvider>
     )
 }
 export default Message

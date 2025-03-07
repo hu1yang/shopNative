@@ -1,13 +1,18 @@
+import {IUserInfo} from "@/types/user";
+
 export type optionMessageProp = {
     id?: number,
     message: any,
     type: number,
     roomId: number,
+    sendInfo:IUserInfo,
     sendUser: string,
+    sendUserId: number,
     createBy?: number,
     status?: number,
     messageToken?: string,
 }
+
 
 export type ImessageListData = {
     room_id:number,
@@ -17,4 +22,5 @@ export type ImessageListData = {
     participants:string,
     created_by:string,
     room_picture?:string,
+    messages?:optionMessageProp[]
 }

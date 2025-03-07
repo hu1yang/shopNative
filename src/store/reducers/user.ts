@@ -1,17 +1,30 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { setToken, removeToken } from "../actions/user";
+import { setUser, removeUser } from "../actions/user";
 import {IUserInfo} from "@/types/user";
-import { createAction } from "@reduxjs/toolkit";
 
 
-const initialState: IUserInfo|null = { token: '111' };
+const initialState: {
+    userInfo:IUserInfo|null,
+    isLogin:Boolean
+} = {
+    userInfo: null,
+    isLogin:false
+};
 
-export const tokenReducer = createReducer(initialState, (builder) => {
+export const userReducer = createReducer(initialState, (builder) => {
     builder
-    .addCase(setToken, (state, action) => {
-        state.token = action.payload;
+    .addCase(setUser, (state, action) => {
+        return state = {
+            ...state,
+            userInfo: action.payload,
+            isLogin: true,
+        }
     })
-    .addCase(removeToken, (state) => {
-        state.token = null;
+    .addCase(removeUser, (state) => {
+        return state = {
+            ...state,
+            userInfo: null,
+            isLogin: false,
+        }
     });
 });

@@ -1,8 +1,7 @@
 import io,{Socket} from "socket.io-client";
-import EncryptedStorageUtil from "@/util/storage";
 import {optionMessageProp} from "@/types/message";
 import {IUserInfo} from "@/types/user";
-
+import {getData} from "@/util/storage";
 
 export interface IWebSocketParams {
     userId:number;
@@ -19,9 +18,9 @@ class SocketClient {
     async connect(): Promise<void> {
         if(this.socket) return
         const { roomId, userId } = this.params;
-        const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
-        if(userInfo) {
-            const token = userInfo.token
+
+        const token = await getData<string>('token');
+        if(token) {
             this.socket = io(this.url,{
                 extraHeaders: {
                     Authorization: token

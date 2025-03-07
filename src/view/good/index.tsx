@@ -1,4 +1,5 @@
-import React , { useMemo , useState } from "react";
+import React, {useMemo, useState, useRef, ReactHTML, ReactDOM} from "react";
+import { Button , AirbnbRating , Tab , TabView } from "@rneui/themed";
 import {
     View,
     SafeAreaView,
@@ -8,9 +9,10 @@ import {
     ScrollView,
     NativeSyntheticEvent,
     NativeScrollEvent,
-    TouchableOpacity
+    TouchableOpacity,
+    findNodeHandle
 } from 'react-native'
-import {RootStackNavigation} from "@/router/NestingNavigators";
+import {RootStackNavigation} from "@/types/navigation";
 import Swiper from 'react-native-swiper'
 import { useWindowDimensions } from 'react-native';
 import Icon from "react-native-vector-icons/SimpleLineIcons";
@@ -19,9 +21,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Price from "@/component/price";
 import LinearGradient from "react-native-linear-gradient";
 import GoodTips from "@/component/goodTips";
-import { Button , AirbnbRating , Tab } from "@rneui/themed";
 import HTML from 'react-native-render-html';
 import Recommend from "@/component/recommend";
+import {color} from "@rneui/base";
 
 
 
@@ -31,6 +33,7 @@ const styles = StyleSheet.create({
         backgroundColor:'#f2f2f2',
         overflow:'scroll'
     },
+
     goodPicture:{
         height:375,
         width:'100%'
@@ -47,14 +50,32 @@ const styles = StyleSheet.create({
     firstBar:{
         width:'100%',
         padding:10,
+        height:60,
         // position:'absolute',
         // bottom:0,
         // left:0
     },
-    tabsTitle:{
-        color: '#000', fontSize: 12, fontWeight: '400',
-        padding:0
+    tabStyle:{
+        flex: 1,
+        paddingHorizontal:22,
     },
+    tabsTitle:{
+        color: '#999',
+        fontSize: 15,
+        fontWeight: '400',
+    },
+    tabsTitleActive:{
+        color: '#333',
+        fontWeight: 'bold',
+    },
+    tabIndicatorStyle:{
+        backgroundColor:'#333',
+        width: 50,
+        marginLeft:20,
+        height:2,
+        alignSelf: 'center',
+    },
+
     circleFunc:{
         width:28,
         height:28,
@@ -62,15 +83,15 @@ const styles = StyleSheet.create({
         backgroundColor:'rgba(148,147,147,.6)'
     },
     circleFuncOpactiy:{
-      backgroundColor:'transparent'
+        backgroundColor:'transparent'
     },
     circleFuncIcon:{
         color:'#fff',
-        fontSize:18,
+        fontSize:14,
         fontWeight:'bold'
     },
     circleFuncIconColor:{
-       color:'#333',
+        color:'#333',
     },
     content:{
     },
@@ -166,6 +187,13 @@ const styles = StyleSheet.create({
     recommend:{
         paddingHorizontal:10,
         paddingVertical: 16
+    },
+    floatButton:{
+        width: '100%',
+        position: 'absolute',
+        left:0,
+        zIndex: 9,
+        paddingHorizontal:10
     }
 })
 
@@ -175,31 +203,46 @@ const Good = ({navigation}:{navigation:RootStackNavigation}) => {
     const insets = useSafeAreaInsets();
     const windowWidth = useWindowDimensions().width;
     const goodsArr = useMemo(() => (
-        [
-            {
-                name:'钛海THR-218钛白粉 金红石型二氧化钛 高白度易分散通用型钛白粉',
-                picture:'https://cdn.toodudu.com/2023/07/19/Fo6B3WrT90kmkEgygD6Hk01FIIIt65XVNs11iVwf.jpg',
-                price:'20.01'
-            },
-            {
-                name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
-                picture:'https://cdn.toodudu.com/2021/05/10/4Op4H3X5PkMp6ZnADltF86NpRhVAAdRhzuuTOFfg.jpeg',
-                price:'50.01'
-            },
-            {
-                name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
-                picture:'https://cdn.toodudu.com/2019/11/26/4bniUERisINvutrYbmCVND9CC8s2ywSCag07i2Mr.jpeg',
-                price:'30.01'
-            },
-            {
-                name:'南钛NR-950金红石型钛白粉 通用型二氧化钛 高遮盖高白度高耐候性钛白粉 南京生产',
-                picture:'https://cdn.toodudu.com/2021/05/11/QRR0kUQs3y7oPqqKpIURHQHPqR9zPFb30hBwBM3Q.jpeg',
-                price:'10.01'
-            },
-        ]
+            [
+                {
+                    name:'钛海THR-218钛白粉 金红石型二氧化钛 高白度易分散通用型钛白粉',
+                    picture:'https://cdn.toodudu.com/2023/07/19/Fo6B3WrT90kmkEgygD6Hk01FIIIt65XVNs11iVwf.jpg',
+                    price:'20.01'
+                },
+                {
+                    name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
+                    picture:'https://cdn.toodudu.com/2021/05/10/4Op4H3X5PkMp6ZnADltF86NpRhVAAdRhzuuTOFfg.jpeg',
+                    price:'50.01'
+                },
+                {
+                    name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
+                    picture:'https://cdn.toodudu.com/2019/11/26/4bniUERisINvutrYbmCVND9CC8s2ywSCag07i2Mr.jpeg',
+                    price:'30.01'
+                },
+                {
+                    name:'南钛NR-950金红石型钛白粉 通用型二氧化钛 高遮盖高白度高耐候性钛白粉 南京生产',
+                    picture:'https://cdn.toodudu.com/2021/05/11/QRR0kUQs3y7oPqqKpIURHQHPqR9zPFb30hBwBM3Q.jpeg',
+                    price:'10.01'
+                },
+            ]
     ), []);
     const [opacity, setOpacity] = useState<number>(0);
+    const [TabIndex, setTabIndex] = useState(0);
+
+    const tabArr:string[] = ['商品', '评论', '详情', '推荐'];
+    const isScrollingByTab = useRef(false); // 滚动锁
+    const scrollRef = useRef<ScrollView>(null);
+    const sectionRefs = [
+        useRef(null),
+        useRef(null),
+        useRef(null),
+        useRef(null),
+    ];
+
     const handleScroll = (event:NativeSyntheticEvent<NativeScrollEvent>) => {
+        if(isScrollingByTab.current){
+            return false
+        }
         const {contentOffset} =  event.nativeEvent
         if(contentOffset.y < 20){
             setOpacity(0)
@@ -210,230 +253,264 @@ const Good = ({navigation}:{navigation:RootStackNavigation}) => {
         }else{
             setOpacity(1)
         }
+        sectionRefs.forEach((ref:React.RefObject<View>, index) => {
+            if (ref.current) {
+                ref.current.measure((x, y, width, height, pageX, pageY) => {
+                    const topOffset = insets.top + 60;
+                    if (y < contentOffset.y + topOffset && contentOffset.y < height + y + topOffset) {
+                        setTabIndex(index);
+                    }
+                });
+            }
+        });
+    }
+    const changeTab = (e:number) => {
+        let handle: React.RefObject<View> = sectionRefs[e]
+        if (handle.current) {
+            isScrollingByTab.current = true;
+            handle.current.measure((x, y, width, height, pageX, pageY) => {
+                const scrollY = (y - insets.top - 60) > 0 ? y - insets.top - 60 : 0;
+                scrollRef.current?.scrollTo({ y: scrollY, animated: true });
+                // 等待滚动完成后解锁（适当延时，避免闪烁）
+                setTimeout(() => {
+                    isScrollingByTab.current = false;
+                }, 300); // 延迟时间视情况调整
+            });
+        }
+        setTabIndex(e)
     }
 
     return (
-        <View style={[styles.container]}>
-            <SafeAreaView style={{backgroundColor: `rgba(255, 255, 255, ${opacity})`,position:'absolute',top:0,left:0,right:0,zIndex:9}}>
-                <View style={[defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.fd_row,styles.firstBar]}>
-                    <View style={[{width:166}]}>
-                        <Tab value={0} dense buttonStyle={{padding:0}} containerStyle={{padding:0}}>
-                            <Tab.Item titleStyle={styles.tabsTitle} containerStyle={{padding:0}}>商量</Tab.Item>
-                            <Tab.Item titleStyle={styles.tabsTitle}>评价</Tab.Item>
-                            <Tab.Item titleStyle={styles.tabsTitle}>详情</Tab.Item>
-                            <Tab.Item titleStyle={styles.tabsTitle}>推荐</Tab.Item>
-                        </Tab>
+            <View style={[styles.container]}>
+                <SafeAreaView style={{backgroundColor: `rgba(255, 255, 255, ${opacity > 0.1 ? opacity : 0})`,position:'absolute',top:0,left:0,right:0,zIndex:9}}>
+                    <View style={[defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,defaultStyled.fd_row,styles.firstBar]}>
+                        <TouchableOpacity onPress={navigation.goBack}>
+                            <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{backgroundColor: opacity?`transparent`:'rgba(148,147,147,.6)'} ]}>
+                                <Icon name='arrow-left' style={[styles.circleFuncIcon,{color: opacity?'#333':'#fff'}]} />
+                            </View>
+                        </TouchableOpacity>
+                        <View style={[styles.tabStyle, {opacity}]}>
+                            <Tab value={TabIndex} onChange={changeTab} dense indicatorStyle={styles.tabIndicatorStyle}>
+                                {
+                                    tabArr.map((item,index) => {
+                                        return <Tab.Item titleStyle={[styles.tabsTitle,TabIndex === index && styles.tabsTitleActive]} key={index}>{item}</Tab.Item>
+                                    })
+                                }
+                            </Tab>
+                        </View>
+                        <TouchableOpacity onPress={navigation.goBack}>
+                            <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{backgroundColor: opacity?`transparent`:'rgba(148,147,147,.6)'} ]}>
+                                <Icon name='share-alt' style={[styles.circleFuncIcon,{color: opacity?'#333':'#fff'}]} />
+                            </View>
+                        </TouchableOpacity>
                     </View>
+                </SafeAreaView>
+                {/*<View style={[defaultStyled.flex,defaultStyled.jc_bt,defaultStyled.fd_row,styles.floatButton,{top: insets.top + 15}]}>*/}
+                {/*    <TouchableOpacity onPress={navigation.goBack}>*/}
+                {/*        <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,opacity?styles.circleFuncOpactiy : null ]}>*/}
+                {/*            <Icon name='arrow-left' size={17} style={[styles.circleFuncIcon,opacity?styles.circleFuncIconColor:null]} />*/}
+                {/*        </View>*/}
+                {/*    </TouchableOpacity>*/}
+                {/*    <TouchableOpacity onPress={navigation.goBack}>*/}
+                {/*        <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{marginRight:7.5},opacity ? styles.circleFuncOpactiy : null]}>*/}
+                {/*            <Icon name='share-alt' size={17} style={[styles.circleFuncIcon,opacity ? styles.circleFuncIconColor : null]} />*/}
+                {/*        </View>*/}
+                {/*    </TouchableOpacity>*/}
+                {/*</View>*/}
 
-                    {/*<View>*/}
-                    {/*    <TouchableOpacity onPress={navigation.goBack}>*/}
-                    {/*        <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,opacity && styles.circleFuncOpactiy ]} onpr>*/}
-                    {/*            <Icon name='arrow-left' size={17} style={[styles.circleFuncIcon,opacity && styles.circleFuncIconColor]} />*/}
-                    {/*        </View>*/}
-                    {/*    </TouchableOpacity>*/}
-                    {/*</View>*/}
-                    {/*    */}
-                    {/*<View style={[defaultStyled.flex,defaultStyled.fd_row]}>*/}
-                    {/*    <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{marginRight:7.5},opacity && styles.circleFuncOpactiy]}>*/}
-                    {/*        <Icon name='share-alt' size={17} style={[styles.circleFuncIcon,opacity && styles.circleFuncIconColor]} />*/}
-                    {/*    </View>*/}
-                    {/*    <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,opacity && styles.circleFuncOpactiy]}>*/}
-                    {/*        <Icon name='options' size={17} style={[styles.circleFuncIcon,opacity && styles.circleFuncIconColor]} />*/}
-                    {/*    </View>*/}
-                    {/*</View>*/}
-                </View>
-            </SafeAreaView>
-            <ScrollView onScroll={handleScroll} scrollEventThrottle={120}>
-                <View style={styles.goodPicture}>
-                    <Swiper dot={
-                        <View style={{
-                            height: 3,
-                            width: 5,
-                            backgroundColor: 'rgba(0, 0, 0, .2)',
-                            borderRadius: 1.5,
-                            marginHorizontal: 2.5
-                        }}></View>
-                    } activeDot={
-                        <View style={{
-                            height: 3,
-                            width: 15,
-                            backgroundColor: 'rgba(0, 0, 0, .6)',
-                            borderRadius: 1.5,
-                            marginHorizontal: 2.5
-                        }}></View>
-                    } style={styles.swiperWrapper} showsButtons={false} horizontal={true} loop={true} autoplay={true}
-                            autoplayTimeout={2}>
-                        <View style={{flex: 1}}>
-                            <Image resizeMode="stretch" style={{flex: 1}}
-                                   source={{uri: 'https://cdn.toodudu.com/2021/05/10/UMVfS4wCOR5bZjtneaTjFVbscxAtXV8nfBadiCt3.jpeg'}}></Image>
+                <ScrollView onScroll={handleScroll} scrollEventThrottle={120} ref={scrollRef} style={[defaultStyled.flex,defaultStyled.fd_column,{marginBottom:insets.bottom}]}>
+                    <View ref={sectionRefs[0]}>
+                        <View style={styles.goodPicture}>
+                            <Swiper dot={
+                                <View style={{
+                                    height: 3,
+                                    width: 5,
+                                    backgroundColor: 'rgba(0, 0, 0, .2)',
+                                    borderRadius: 1.5,
+                                    marginHorizontal: 2.5
+                                }}></View>
+                            } activeDot={
+                                <View style={{
+                                    height: 3,
+                                    width: 15,
+                                    backgroundColor: 'rgba(0, 0, 0, .6)',
+                                    borderRadius: 1.5,
+                                    marginHorizontal: 2.5
+                                }}></View>
+                            } style={styles.swiperWrapper} showsButtons={false} horizontal={true} loop={true} autoplay={true}
+                                    autoplayTimeout={2}>
+                                <View style={{flex: 1}}>
+                                    <Image resizeMode="stretch" style={{flex: 1}}
+                                           source={{uri: 'https://cdn.toodudu.com/2021/05/10/UMVfS4wCOR5bZjtneaTjFVbscxAtXV8nfBadiCt3.jpeg'}}></Image>
+                                </View>
+                                <View style={{flex: 1}}>
+                                    <Image resizeMode="stretch" style={{flex: 1}}
+                                           source={{uri: 'https://cdn.toodudu.com/2021/12/03/0QzlQ0W76CEPJHprWje7DrUYXpKnmkwbmSKHnwTZ.jpg'}}></Image>
+                                </View>
+                            </Swiper>
                         </View>
-                        <View style={{flex: 1}}>
-                            <Image resizeMode="stretch" style={{flex: 1}}
-                                   source={{uri: 'https://cdn.toodudu.com/2021/12/03/0QzlQ0W76CEPJHprWje7DrUYXpKnmkwbmSKHnwTZ.jpg'}}></Image>
+                        <View style={[styles.priceLadderBox,defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct]}>
+                            <View style={styles.priceLadder}>
+                                <Price defaultn={20000} floatn='01' />
+                                <Text style={styles.tonnage}>1~9吨</Text>
+                            </View>
+                            <View style={styles.priceLadder}>
+                                <Price defaultn={18000} floatn='01' />
+                                <Text style={styles.tonnage}>10~19吨</Text>
+                            </View>
+                            <View style={styles.priceLadder}>
+                                <Price defaultn={16000} floatn='01' />
+                                <Text style={styles.tonnage}>20~以上</Text>
+                            </View>
                         </View>
-                    </Swiper>
-                </View>
+                        <View style={styles.goodDetailName}>
+                            <View style={styles.goodInformation}>
+                                <View style={[defaultStyled.flex,defaultStyled.fd_row]}>
+                                    <GoodTips name='多多超市' style={{marginRight:5}} colors={['rgba(250, 95, 95, 1)', 'rgba(247, 17, 17, 1)']} width={50} />
+                                    <GoodTips name='商家直营' style={{marginRight:5}} colors={['rgba(115, 92, 255, 1)', 'rgba(84, 54, 213, 1)']} width={50} />
+                                    <GoodTips name='现货' style={{marginRight:5}} colors={['rgba(255, 140, 17, 1)', 'rgba(255, 140, 17, 1)']} width={30} />
+                                </View>
+                                <View>
 
-                <View style={[styles.content,{marginBottom:insets.bottom}]}>
-                    <View style={[styles.priceLadderBox,defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct]}>
-                        <View style={styles.priceLadder}>
-                            <Price defaultn={20000} floatn='01' />
-                            <Text style={styles.tonnage}>1~9吨</Text>
+                                </View>
+                            </View>
+                            <View style={{marginVertical: 10}}>
+                                <Text style={{fontSize:14,fontWeight:'400',color:'#333',marginBottom:10}} numberOfLines={2} ellipsizeMode="tail">商品名称商品名称商品名称商品商品名称商品名称商名品名称商品名称商品名称商品商品名称商品商品名称商商品名称商品名称商品名称商品商品名称商品名称商名品名称商品名称商品名称商品商品名称商品商品名称商</Text>
+                                <Text style={{fontSize:14,fontWeight:'400',color:'rgba(247, 17, 17, 1)',marginBottom:10}} numberOfLines={2} ellipsizeMode="tail">商品二级标题！商品二级标题！商品二级标题！商品二级标题！商 品二级标题！</Text>
+                            </View>
+                            {/*<View style={styles.distribution}>*/}
+                            {/*    <LinearGradient*/}
+                            {/*        colors={['rgba(32, 32, 32, 1)','rgba(77, 79, 83, 1)']}*/}
+                            {/*        start={{ x: 1, y: 0 }}*/}
+                            {/*        end={{x: 0, y: 0}}*/}
+                            {/*        style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,defaultStyled.jc_bt,{flex:1,paddingHorizontal:10}]}>*/}
+                            {/*        <Text style={{fontWeight:'400',fontSize:12,color: '#E7BB83'}}>现在升级成为分销客，下单省¥000.00/吨</Text>*/}
+                            {/*        <Button*/}
+                            {/*            ViewComponent={LinearGradient} // Don't forget this!*/}
+                            {/*            buttonStyle={{width:77,borderRadius:20,   paddingHorizontal: 0,  paddingVertical: 0,}}*/}
+                            {/*            linearGradientProps={{*/}
+                            {/*                colors: ["rgba(202, 152, 81, 1)", "rgba(246, 214, 175, 1)"],*/}
+                            {/*                start: { x: 0, y: 0.5 },*/}
+                            {/*                end: { x: 1, y: 0.5 },*/}
+                            {/*            }}*/}
+                            {/*        >*/}
+                            {/*            <Text style={{fontSize:12,fontWeight:'400',color: '#8B5918'}}>立即申请</Text>*/}
+                            {/*        </Button>*/}
+                            {/*    </LinearGradient>*/}
+                            {/*</View>*/}
                         </View>
-                        <View style={styles.priceLadder}>
-                            <Price defaultn={18000} floatn='01' />
-                            <Text style={styles.tonnage}>10~19吨</Text>
-                        </View>
-                        <View style={styles.priceLadder}>
-                            <Price defaultn={16000} floatn='01' />
-                            <Text style={styles.tonnage}>20~以上</Text>
+                        <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,styles.promotion]}>
+                            <Text style={{fontWeight:'bold',fontSize:12,color:'#333',marginRight:10}}>促销</Text>
+                            <View style={{borderColor:'rgba(247, 17, 17, 1)',borderWidth:.5,paddingHorizontal:5,paddingVertical:2,borderRadius:4}}>
+                                <Text style={{fontSize:10,fontWeight:'400',color: '#F71111'}}>满减</Text>
+                            </View>
+                            <Text style={{fontWeight:'400',fontSize:10,color:'#666',marginLeft:10}}>满100吨，每吨减20000元，总优惠金额以结算价为准</Text>
                         </View>
                     </View>
-                    <View style={styles.goodDetailName}>
-                        <View style={styles.goodInformation}>
-                            <View style={[defaultStyled.flex,defaultStyled.fd_row]}>
-                                <GoodTips name='多多超市' style={{marginRight:5}} colors={['rgba(250, 95, 95, 1)', 'rgba(247, 17, 17, 1)']} width={50} />
-                                <GoodTips name='商家直营' style={{marginRight:5}} colors={['rgba(115, 92, 255, 1)', 'rgba(84, 54, 213, 1)']} width={50} />
-                                <GoodTips name='现货' style={{marginRight:5}} colors={['rgba(255, 140, 17, 1)', 'rgba(255, 140, 17, 1)']} width={30} />
-                            </View>
-                            <View>
-
-                            </View>
-                        </View>
-                        <View style={{marginVertical: 10}}>
-                            <Text style={{fontSize:14,fontWeight:'400',color:'#333',marginBottom:10}} numberOfLines={2} ellipsizeMode="tail">商品名称商品名称商品名称商品商品名称商品名称商名品名称商品名称商品名称商品商品名称商品商品名称商商品名称商品名称商品名称商品商品名称商品名称商名品名称商品名称商品名称商品商品名称商品商品名称商</Text>
-                            <Text style={{fontSize:14,fontWeight:'400',color:'rgba(247, 17, 17, 1)',marginBottom:10}} numberOfLines={2} ellipsizeMode="tail">商品二级标题！商品二级标题！商品二级标题！商品二级标题！商 品二级标题！</Text>
-                        </View>
-                        <View style={styles.distribution}>
-                            <LinearGradient
-                                colors={['rgba(32, 32, 32, 1)','rgba(77, 79, 83, 1)']}
-                                start={{ x: 1, y: 0 }}
-                                end={{x: 0, y: 0}}
-                                style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,defaultStyled.jc_bt,{flex:1,paddingHorizontal:10}]}>
-                                <Text style={{fontWeight:'400',fontSize:12,color: '#E7BB83'}}>现在升级成为分销客，下单省¥000.00/吨</Text>
-                                <Button
-                                    ViewComponent={LinearGradient} // Don't forget this!
-                                    buttonStyle={{width:77,borderRadius:20}}
-                                    linearGradientProps={{
-                                        colors: ["rgba(202, 152, 81, 1)", "rgba(246, 214, 175, 1)"],
-                                        start: { x: 0, y: 0.5 },
-                                        end: { x: 1, y: 0.5 },
-                                    }}
-                                >
-                                    <Text style={{fontSize:12,fontWeight:'400',color: '#8B5918'}}>立即申请</Text>
-                                </Button>
-                            </LinearGradient>
-                        </View>
-                    </View>
-                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,styles.promotion]}>
-                        <Text style={{fontWeight:'bold',fontSize:12,color:'#333',marginRight:10}}>促销</Text>
-                        <View style={{borderColor:'rgba(247, 17, 17, 1)',borderWidth:.5,paddingHorizontal:5,paddingVertical:2,borderRadius:4}}>
-                            <Text style={{fontSize:10,fontWeight:'400',color: '#F71111'}}>满减</Text>
-                        </View>
-                        <Text style={{fontWeight:'400',fontSize:10,color:'#666',marginLeft:10}}>满100吨，每吨减20000元，总优惠金额以结算价为准</Text>
-                    </View>
-                    <View style={styles.evaluateBox}>
-                        <View style={[styles.evaluate]}>
-                            <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct]}>
-                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
-                                    <LinearGradient
-                                        colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{x: 0, y: 1}}
-                                        style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
-                                    </LinearGradient>
-                                    <Text style={{fontSize:12,color:'rgba(51, 51, 51, 1)',fontWeight:'bold',marginLeft:10}}>商品评价</Text>
-                                    <Text style={{fontSize:12,color:'rgba(153, 153, 153, 1)',}}>(10000)</Text>
-                                </View>
-                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
-                                    <Text style={{fontWeight:'400',fontSize:12,color:'#999'}}>全部</Text>
-                                    <Icon name='right' size={17} style={{fontWeight:'400',fontSize:12,color:'#333',marginLeft:10}} />
-                                </View>
-                            </View>
-                        </View>
-                        <View style={styles.consulting}>
-                            <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct]}>
-                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
-                                    <LinearGradient
-                                        colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{x: 0, y: 1}}
-                                        style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
-                                    </LinearGradient>
-                                    <Text style={{fontSize:12,color:'rgba(51, 51, 51, 1)',fontWeight:'bold',marginLeft:10}}>购买咨询</Text>
-                                </View>
-                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
-                                    <Icon name='right' size={17} style={{fontWeight:'400',fontSize:12,color:'#333',marginLeft:10}} />
-                                </View>
-                            </View>
-                            <View style={styles.consultingList}>
-                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,{marginTop:11}]}>
-                                    <LinearGradient
-                                        colors={['#2a6bf0','#76acfb']}
-                                        start={{ x: 1, y: 0 }}
-                                        end={{x: 0, y: 0}}
-                                        style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:14,height:14}]}>
-                                        <Text style={{fontSize:10,fontWeight:'400',color: '#fff'}}>问</Text>
-                                    </LinearGradient>
-                                    <Text style={{fontSize:11,fontWeight:'400',color:'#333',marginLeft:5}}>这款涂料好使吗</Text>
-                                </View>
-                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,{marginTop:11}]}>
-                                    <LinearGradient
-                                        colors={['#2a6bf0','#76acfb']}
-                                        start={{ x: 1, y: 0 }}
-                                        end={{x: 0, y: 0}}
-                                        style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:14,height:14}]}>
-                                        <Text style={{fontSize:10,fontWeight:'400',color: '#fff'}}>问</Text>
-                                    </LinearGradient>
-                                    <Text style={{fontSize:11,fontWeight:'400',color:'#333',marginLeft:5}}>这款涂料好使吗</Text>
-                                </View>
-                            </View>
-
-                        </View>
-                    </View>
-                    <View style={styles.shopBox}>
-                        <View style={[defaultStyled.flex,defaultStyled.jc_bt,defaultStyled.fd_row,defaultStyled.ai_ct,styles.shopDetail]}>
-                            <View style={[defaultStyled.flex,defaultStyled.fd_row,styles.shopNames]}>
-                                <View style={styles.shopLogo}>
-                                    <Image resizeMode='stretch' style={{flex:1,overflow:'hidden',borderRadius:25}} source={{uri:'https://cdn.toodudu.com/2021/09/07/mt6ch6S1sEC9NZyW9FUYClwrjWIct33P70nMzaxy.jpeg'}}></Image>
-                                </View>
-                                <View style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.jc_bt,{marginLeft:5}]}>
-                                    <Text style={{fontWeight:'400',fontSize:12,color:'#333'}}>涂多多商城</Text>
-                                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_ct,styles.routingBox]}>
-                                        <AirbnbRating selectedColor={'red'} size={6} isDisabled={true} showRating={false} defaultRating={3} count={5} />
+                    <View ref={sectionRefs[1]}>
+                        <View style={styles.evaluateBox}>
+                            <View style={[styles.evaluate]}>
+                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct]}>
+                                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
+                                        <LinearGradient
+                                                colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
+                                                start={{ x: 0, y: 0 }}
+                                                end={{x: 0, y: 1}}
+                                                style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
+                                        </LinearGradient>
+                                        <Text style={{fontSize:12,color:'rgba(51, 51, 51, 1)',fontWeight:'bold',marginLeft:10}}>商品评价</Text>
+                                        <Text style={{fontSize:12,color:'rgba(153, 153, 153, 1)',}}>(10000)</Text>
+                                    </View>
+                                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
+                                        <Text style={{fontWeight:'400',fontSize:12,color:'#999'}}>全部</Text>
+                                        <Icon name='right' size={17} style={{fontWeight:'400',fontSize:12,color:'#333',marginLeft:10}} />
                                     </View>
                                 </View>
                             </View>
-                            <Icon name='right' size={17} style={{fontWeight:'400',fontSize:12,color:'#333',marginLeft:10}} />
-                        </View>
-                        <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_en,styles.shopfnc]}>
-                            <View style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct]}>
-                                <Text style={{color:'#333',fontSize:12,marginBottom:10}}>1000</Text>
-                                <Text style={{color:'#333',fontSize:12,marginBottom:10}}>关注人数</Text>
-                                <Button type="outline" buttonStyle={{width:110,borderRadius:110,height:31,borderColor: '#ccc'}}>
-                                    <Image resizeMode='stretch' style={{width:14,height:14,marginRight:7}} source={{uri:'https://cdn.toodudu.com/uploads/2023/10/23/good-service.png'}}></Image>
-                                    <Text style={{fontSize:12,fontWeight:'400',color: '#333'}}>联系客服</Text>
-                                </Button>
+                            <View style={styles.consulting}>
+                                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct]}>
+                                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
+                                        <LinearGradient
+                                                colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
+                                                start={{ x: 0, y: 0 }}
+                                                end={{x: 0, y: 1}}
+                                                style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
+                                        </LinearGradient>
+                                        <Text style={{fontSize:12,color:'rgba(51, 51, 51, 1)',fontWeight:'bold',marginLeft:10}}>购买咨询</Text>
+                                    </View>
+                                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
+                                        <Icon name='right' size={17} style={{fontWeight:'400',fontSize:12,color:'#333',marginLeft:10}} />
+                                    </View>
+                                </View>
+                                <View style={styles.consultingList}>
+                                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,{marginTop:11}]}>
+                                        <LinearGradient
+                                                colors={['#2a6bf0','#76acfb']}
+                                                start={{ x: 1, y: 0 }}
+                                                end={{x: 0, y: 0}}
+                                                style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:14,height:14}]}>
+                                            <Text style={{fontSize:10,fontWeight:'400',color: '#fff'}}>问</Text>
+                                        </LinearGradient>
+                                        <Text style={{fontSize:11,fontWeight:'400',color:'#333',marginLeft:5}}>这款涂料好使吗</Text>
+                                    </View>
+                                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,{marginTop:11}]}>
+                                        <LinearGradient
+                                                colors={['#2a6bf0','#76acfb']}
+                                                start={{ x: 1, y: 0 }}
+                                                end={{x: 0, y: 0}}
+                                                style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:14,height:14}]}>
+                                            <Text style={{fontSize:10,fontWeight:'400',color: '#fff'}}>问</Text>
+                                        </LinearGradient>
+                                        <Text style={{fontSize:11,fontWeight:'400',color:'#333',marginLeft:5}}>这款涂料好使吗</Text>
+                                    </View>
+                                </View>
+
                             </View>
-                            <View style={{width:.5,height:31,borderLeftColor: '#ccc',borderLeftWidth:1}}></View>
-                            <View style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct]}>
-                                <Text style={{color:'#333',fontSize:12,marginBottom:10}}>1000</Text>
-                                <Text style={{color:'#333',fontSize:12,marginBottom:10}}>全部商品</Text>
-                                <Button type="outline" buttonStyle={{width:110,borderRadius:110,height:31,borderColor: '#ccc'}}>
-                                    <Image resizeMode='stretch' style={{width:14,height:14,marginRight:7}} source={{uri:'https://cdn.toodudu.com/uploads/2023/10/23/shop.png'}}></Image>
-                                    <Text style={{fontSize:12,fontWeight:'400',color: '#333'}}>进店逛逛</Text>
-                                </Button>
+                        </View>
+                        <View style={styles.shopBox}>
+                            <View style={[defaultStyled.flex,defaultStyled.jc_bt,defaultStyled.fd_row,defaultStyled.ai_ct,styles.shopDetail]}>
+                                <View style={[defaultStyled.flex,defaultStyled.fd_row,styles.shopNames]}>
+                                    <View style={styles.shopLogo}>
+                                        <Image resizeMode='stretch' style={{flex:1,overflow:'hidden',borderRadius:25}} source={{uri:'https://cdn.toodudu.com/2021/09/07/mt6ch6S1sEC9NZyW9FUYClwrjWIct33P70nMzaxy.jpeg'}}></Image>
+                                    </View>
+                                    <View style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.jc_bt,{marginLeft:5}]}>
+                                        <Text style={{fontWeight:'400',fontSize:12,color:'#333'}}>涂多多商城</Text>
+                                        <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_ct,styles.routingBox]}>
+                                            <AirbnbRating selectedColor={'red'} size={6} isDisabled={true} showRating={false} defaultRating={3} count={5} />
+                                        </View>
+                                    </View>
+                                </View>
+                                <Icon name='right' size={17} style={{fontWeight:'400',fontSize:12,color:'#333',marginLeft:10}} />
+                            </View>
+                            <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_en,styles.shopfnc]}>
+                                <View style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct]}>
+                                    <Text style={{color:'#333',fontSize:12,marginBottom:10}}>1000</Text>
+                                    <Text style={{color:'#333',fontSize:12,marginBottom:10}}>关注人数</Text>
+                                    <Button type="outline" buttonStyle={{width:110,borderRadius:110,height:31,borderColor: '#ccc'}}>
+                                        <Image resizeMode='stretch' style={{width:14,height:14,marginRight:7}} source={{uri:'https://cdn.toodudu.com/uploads/2023/10/23/good-service.png'}}></Image>
+                                        <Text style={{fontSize:12,fontWeight:'400',color: '#333'}}>联系客服</Text>
+                                    </Button>
+                                </View>
+                                <View style={{width:.5,height:31,borderLeftColor: '#ccc',borderLeftWidth:1}}></View>
+                                <View style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct]}>
+                                    <Text style={{color:'#333',fontSize:12,marginBottom:10}}>1000</Text>
+                                    <Text style={{color:'#333',fontSize:12,marginBottom:10}}>全部商品</Text>
+                                    <Button type="outline" buttonStyle={{width:110,borderRadius:110,height:31,borderColor: '#ccc'}}>
+                                        <Image resizeMode='stretch' style={{width:14,height:14,marginRight:7}} source={{uri:'https://cdn.toodudu.com/uploads/2023/10/23/shop.png'}}></Image>
+                                        <Text style={{fontSize:12,fontWeight:'400',color: '#333'}}>进店逛逛</Text>
+                                    </Button>
+                                </View>
                             </View>
                         </View>
                     </View>
-                    <View style={styles.goodDetail}>
+                    <View style={styles.goodDetail} ref={sectionRefs[2]}>
                         <View>
                             <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
                                 <LinearGradient
-                                    colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{x: 0, y: 1}}
-                                    style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
+                                        colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{x: 0, y: 1}}
+                                        style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
                                 </LinearGradient>
                                 <Text style={{fontSize:14,color:'#333',fontWeight:'bold',marginLeft:10}}>详情</Text>
                             </View>
@@ -442,10 +519,10 @@ const Good = ({navigation}:{navigation:RootStackNavigation}) => {
                         <View>
                             <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
                                 <LinearGradient
-                                    colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{x: 0, y: 1}}
-                                    style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
+                                        colors={['rgba(247, 17, 17, 1)','rgba(255, 255, 255, 1)']}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{x: 0, y: 1}}
+                                        style={[defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.jc_ct,{width:3,height:12}]}>
                                 </LinearGradient>
                                 <Text style={{fontSize:14,color:'#333',fontWeight:'bold',marginLeft:10}}>价格说明</Text>
                             </View>
@@ -455,12 +532,11 @@ const Good = ({navigation}:{navigation:RootStackNavigation}) => {
                             <Text style={{color:'#333',fontSize:12,marginTop:10,lineHeight:18}}><Text style={{fontWeight:'600'}}>异常问题：</Text>商品促销信息以商品详情页“促销”栏中的信息为准；商品的具体售价以订单结算页价格为准；如您发现活动商品售价或促销信息有异常，建议购买前先联系销售商咨询。</Text>
                         </View>
                     </View>
-                    <View style={styles.recommend}>
+                    <View style={styles.recommend} ref={sectionRefs[3]}>
                         <Recommend goods={goodsArr} load={false} centerTitle={true} />
                     </View>
-                </View>
-            </ScrollView>
-        </View>
+                </ScrollView>
+            </View>
     )
 }
 export default Good

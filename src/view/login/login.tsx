@@ -8,11 +8,12 @@ import {Button} from "@rneui/themed";
 import LinearGradient from "react-native-linear-gradient";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import axios, {CustomData} from '@/util/axios';
-import EncryptedStorageUtil from '@/util/storage';
+import { storeData } from '@/util/storage';
 import {RootStackNavigation} from '@/types/navigation';
 import Toast from 'react-native-toast-message';
 import {IUserInfo} from "@/types/user";
-
+import { useDispatch } from 'react-redux';
+import {setUser} from "@/store/actions/user";
 
 
 const styles = StyleSheet.create({
@@ -70,6 +71,7 @@ const Login = ({navigation}:{
     const [password, setPassword] = useState<string>('');
     const [isSecure, setIsSecure] = useState<boolean>(true);
     const [isRead, setIsRead] = useState<boolean>(false);
+    const dispatch = useDispatch();
 
     const loginSubmit = () => {
         if(!username || !password){
@@ -108,15 +110,21 @@ const Login = ({navigation}:{
             });
             return
         }
-        axios.post<IUserInfo>('/login',{username,password}).then(async res =>  {
+        axios.post<{
+            userInfo:IUserInfo,
+            token:string
+        }>('/login',{username,password}).then(async res =>  {
             if(res.code === 200){
-                const userInfo = res.data;
-                if (userInfo){
-                    await EncryptedStorageUtil.setItem<IUserInfo>('userInfo',userInfo);
+                const data = res.data;
+                if (data){
+                    await storeData<IUserInfo>('userInfo',data.userInfo);
+                    await storeData<string>('token',data.token);
+                    dispatch(setUser(data.userInfo))
+                    setTimeout(() => {
+                        navigation.goBack();
+                    },200)
                 }
-                setTimeout(() => {
-                    navigation.goBack();
-                },200)
+
             }else if(res.code === 400){
                 Toast.show({
                     type: 'error',  // 可以选择不同的类型，如 success, error, info
@@ -176,28 +184,40 @@ const Login = ({navigation}:{
                     </View>
                     <Pressable onPress={() => setIsRead(!isRead)} style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct]}>
                         <Icon name='checkcircle' size={16} style={{color: isRead?'#0062EA':'#999' }}></Icon>
-                        <Text style={{marginLeft:9.5, fontSize: 12, color:'#333'}}>我已认真阅读、理解并同意<Link to={{ screen: 'Tabbar', params: { screen: 'Message' } }} style={{color:'#668EEA'}}>《用户协议》</Link><Link to={{ screen: 'Tabbar', params: { screen: 'Message' } }} style={{color:'#668EEA'}}>《隐私协议》</Link></Text>
+                        <Text style={{marginLeft:9.5, fontSize: 12, color:'#333'}}>我已认真阅读、理解并同意<Link  screen='Tabbar' params={{screen:'Message'}} style={{color:'#668EEA'}}>《用户协议》</Link><Link to={{ screen: 'Tabbar', params: { screen: 'Message' } }} style={{color:'#668EEA'}}>《隐私协议》</Link></Text>
                     </Pressable>
                     <View style={{paddingHorizontal:22.5}}>
                         <Button
-                            ViewComponent={LinearGradient} // Don't forget this!
-                            buttonStyle={{width:'100%',height:45,borderRadius:22,alignSelf:'center',marginTop:42}}
+                            ViewComponent={LinearGradient}
                             linearGradientProps={{
-                                colors: ["#FF0000", "#FF7979"],
+                                colors: ["#FF9800", "#F44336"],
                                 start: { x: 0, y: 0.5 },
                                 end: { x: 1, y: 0.5 },
                             }}
+                            buttonStyle={{
+                                width: '100%',
+                                height: 45,
+                                borderRadius: 22,
+                                alignSelf: 'center',
+                                marginTop: 42,
+                                borderWidth: 0,
+                                paddingHorizontal: 0, // 清除横向内边距
+                                paddingVertical: 0, // 清除纵向内边距
+                                backgroundColor: 'transparent',  // 使背景透明，确保渐变背景能显示
+                            }}
                             onPress={loginSubmit}
                         >
-                            <Text style={{fontSize:16,fontWeight:'600',color: '#FFFFFF'}}>登 录</Text>
+                            <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>
+                                登 录
+                            </Text>
                         </Button>
 
                     </View>
                 </View>
                 <View style={[defaultStyled.flex,defaultStyled.jc_bt,defaultStyled.fd_row,{paddingHorizontal:59,marginTop:15}]}>
-                    <Link to={{ screen: 'Tabbar', params: { screen: 'Message' } }} style={{color:'#333333',fontSize:12}}>新用户注册</Link>
-                    <Link to={{ screen: 'Tabbar', params: { screen: 'Message' } }} style={{color:'#333333',fontSize:12}}>短信验证码登录</Link>
-                    <Link to={{ screen: 'Tabbar', params: { screen: 'Message' } }} style={{color:'#333333',fontSize:12}}>忘记密码</Link>
+                    <Link screen='Tabbar' params={{screen:'Message'}} style={{color:'#333333',fontSize:12}}>新用户注册</Link>
+                    <Link screen='Tabbar' params={{screen:'Message'}} style={{color:'#333333',fontSize:12}}>短信验证码登录</Link>
+                    <Link screen='Tabbar' params={{screen:'Message'}} style={{color:'#333333',fontSize:12}}>忘记密码</Link>
                 </View>
             </SafeAreaView>
             <View style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.ai_ct,defaultStyled.jc_ct,styles.otherLogin,{marginBottom:insets.bottom}]}>

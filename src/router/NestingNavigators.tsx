@@ -27,7 +27,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 
-const Tabbar: React.FC<StackScreenProps<RootStackParamList, 'Tabbar'>> = ({ navigation, route }):JSX.Element => (
+const Tabbar: React.FC<StackScreenProps<RootStackParamList, 'Tabbar'>> = ({ navigation, route }) => (
     <Tab.Navigator screenOptions={({ route }: { route: RouteProp<MainTabParamList, keyof MainTabParamList> }) => ({
         tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => {
             let iconName: string | undefined;
@@ -75,18 +75,16 @@ const Tabbar: React.FC<StackScreenProps<RootStackParamList, 'Tabbar'>> = ({ navi
 )
 
 const NestingNavigators = ():JSX.Element => (
-    <>
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen name="Tabbar" options={{ title: "" , headerShown:false}} component={Tabbar} />
-                <Stack.Screen name="Login" options={{ title: 'login' , headerShown:false , headerMode:'float', headerTitleAlign:'left' }} component={Login} />
-                <Stack.Screen name="Cart" options={{ title: "购物车" }} component={Cart} />
-                <Stack.Screen name="Chat" options={{ title: 'chat' , }} component={Chat} />
-                <Stack.Screen name="Good" options={{ title: "good", headerShown:false, headerMode:'float', headerTitleAlign:'left' }} component={Good} />
-            </Stack.Navigator>
-            <Toast />
-        </NavigationContainer>
-    </>
+    <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Good" options={{ title: "good", headerShown:false, headerMode:'float', headerTitleAlign:'left' }} component={Good} />
+          <Stack.Screen name="Tabbar" options={{ title: "" , headerShown:false}} component={Tabbar} />
+          <Stack.Screen name="Chat" options={{ title: 'chat' , }} component={Chat} />
+          <Stack.Screen name="Login" options={{ title: 'login' , headerShown:false , headerMode:'float', headerTitleAlign:'left' }} component={Login} />
+          <Stack.Screen name="Cart" options={{ title: "购物车" }} component={Cart} />
+        </Stack.Navigator>
+        <Toast />
+    </NavigationContainer>
 );
 
 export default NestingNavigators;

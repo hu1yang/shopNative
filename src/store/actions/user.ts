@@ -1,4 +1,5 @@
 import { createAction } from "@reduxjs/toolkit";
+import {IUserInfo} from "@/types/user";
 
-export const setToken = createAction<string>('setToken');
-export const removeToken = createAction('removeToken');
+export const setUser = createAction<IUserInfo>('setUser');
+export const removeUser = createAction('removeUser');

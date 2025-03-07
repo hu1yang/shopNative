@@ -1,34 +1,64 @@
 import React , {useState , useEffect , useRef} from "react";
-import { View, Text , TextInput , StyleSheet , Button , Alert } from "react-native";
+import {View, Text, TextInput, StyleSheet, Button, Alert, SafeAreaView, TouchableOpacity, Platform , KeyboardAvoidingView , ScrollView } from "react-native";
 import { MainTabProps } from "@/router/NestingNavigators";
 import {createMessage} from "@/util/message";
 import axios from "@/util/axios";
 import Toast from "react-native-toast-message";
 import WebSocketClient , { IWebSocketParams } from "@/util/socket";
 import {optionMessageProp} from "@/types/message";
-import EncryptedStorageUtil from "@/util/storage";
+import { useSelector , useDispatch } from "react-redux";
+import {RootState} from "@/store";
 import {IUserInfo} from "@/types/user";
 import defaultStyled from "@/assets/defaultStyled";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+
+
+import History from './History'
 
 const styles = StyleSheet.create({
-    inputStyle:{
+    container:{
         width:'100%',
-        height:50,
-        borderWidth:1,
-        borderStyle:'solid',
-        borderColor:'#ccc'
-    }
+        height:'100%',
+        backgroundColor:'#f8f8f8'
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#E5E5E5',
+        padding: 10,
+    },
+    textInput: {
+        flex: 1,
+        height: 40,
+        borderColor: '#E5E5E5',
+        borderWidth: 1,
+        borderRadius: 20,
+        paddingLeft: 12,
+        fontSize: 16,
+    },
+    sendButton: {
+        backgroundColor: '#0078D4',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        marginLeft: 10,
+    },
+    sendButtonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
 })
 const Chat = (props:MainTabProps<'Chat'>) => {
     const [chat, setChat] = useState<string>('');
     const [roomId, setRoomId] = useState<number|null>(null);
     const [messageList, setMessageList] = useState<optionMessageProp[]>([]);
     const socketRef = useRef<WebSocketClient|null>(null)
-    const userInfo = useRef<IUserInfo|null>(null);
+
+    const userInfo:IUserInfo = useSelector((state:RootState) => state.user.userInfo)
 
     useEffect( () => {
         const fetchUserInfo = async () => {
-            userInfo.current = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
             if (props.route.params.roomId) {
                 setRoomId(props.route.params?.roomId);
                 checkRoom(props.route.params?.roomId);
@@ -99,18 +129,18 @@ const Chat = (props:MainTabProps<'Chat'>) => {
         );
     };
     const clientSocket = async (room_id:number) => {
-        // const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
-        if(!room_id || !userInfo.current) return
+        if(!room_id || !userInfo) return
 
         const params:IWebSocketParams = {
             roomId:room_id,
-            userId:userInfo.current.id
+            userId:userInfo.id
         }
         // 如果已存在连接，则直接返回
         if (socketRef.current) {
             console.log('Socket already initialized.');
             return;
         }
+        console.log(params)
         socketRef.current = new WebSocketClient(params)
 
         try {
@@ -144,36 +174,34 @@ const Chat = (props:MainTabProps<'Chat'>) => {
             message:chat,
             type:1,
             roomId,
-            sendUser:String(userInfo.current?.username),
+            sendInfo:userInfo
         })
         socketRef.current?.sendMessage(option as optionMessageProp);
         setChat('');
     }
     return (
-        <View>
-            {
-                messageList.map((item,index) => {
-                    return (
-                        <View key={index+'---'+item.message} style={defaultStyled.flex,defaultStyled.ai_ct,defaultStyled.fd_row}>
-                            <Text>{item.sendUser}：</Text>
-                            <Text>{item.message}</Text>
-                        </View>
-                    )
-                })
-            }
-            <TextInput
-                style={styles.inputStyle}
-                onChangeText={setChat}
-                value={chat}
-                placeholder="useless placeholder"
-                keyboardType="default"
-            />
-            <Button
-                title='发送'
-                disabled={!socketRef.current?.connected}
-                onPress={sendMessage}
-            />
-        </View>
+        <KeyboardProvider>
+          <View style={styles.container}>
+              <SafeAreaView style={{flex:1}}>
+                  <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.select({ ios: 100, android: 500 })}>
+                      <History messageList={messageList} />
+                      <View style={styles.inputContainer}>
+                          <TextInput
+                              style={styles.textInput}
+                              placeholder="Type a message..."
+                              value={chat}
+                              keyboardType="default"
+                              onChangeText={setChat}
+                          />
+
+                          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+                              <Text style={styles.sendButtonText}>Send</Text>
+                          </TouchableOpacity>
+                      </View>
+                  </KeyboardAvoidingView>
+              </SafeAreaView>
+          </View>
+        </KeyboardProvider>
     )
 }
 

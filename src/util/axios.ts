@@ -1,7 +1,9 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import EncryptedStorageUtil from './storage';
+import { getData , removeData} from './storage';
 import Toast from 'react-native-toast-message';
-import {IUserInfo} from '@/types/user';
+import {removeUser} from "@/store/actions/user";
+import {store , AppDispatch} from "@/store";
+
 
 // 请求配置接口
 export interface IAxiosRequestConfig<D = any> extends InternalAxiosRequestConfig<D> {
@@ -24,6 +26,8 @@ export interface CustomData<D = any> {
 }
 
 // Axios 响应类型
+
+const dispatch: AppDispatch = store.dispatch;
 
 const instance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:3003',
@@ -50,14 +54,9 @@ instance.interceptors.request.use(
         if (config.loading) {
             // loading start
         }
-        let token = ''
-        try {
-            const userInfo = await EncryptedStorageUtil.getItem<IUserInfo>('userInfo');
-            token = userInfo.token;
-        } catch (error) {
-            token = ''
-        }
-        config.headers['Access-Token'] = token || '';
+        const token = await getData<string|null|undefined>('token');
+        console.log(token)
+        config.headers['Access-Token'] = token ? token : '';
         const date = new Date().valueOf(); // 时间戳
         if (config.method === 'post') {
             config.data = {
@@ -79,11 +78,14 @@ instance.interceptors.request.use(
 
 // 响应拦截器
 instance.interceptors.response.use(
-    (response: AxiosResponse) => {
+    async (response: AxiosResponse) => {
         // loading end
         if (response.status === 200) {
             if (response.data.code === 403) {
-                EncryptedStorageUtil.removeItem('userInfo');
+                await removeData('userInfo');
+                await removeData('token')
+                // // 使用 dispatch 操作 Redux 更新用户数据
+                dispatch(removeUser());
             }
             return response;
         }

@@ -1,65 +1,39 @@
-import EncryptedStorage from 'react-native-encrypted-storage';
-
-export default class EncryptedStorageUtil {
-    /**
-     * 保存数据到 EncryptedStorage
-     * @param name 存储的键名
-     * @param data 要存储的数据，可以是对象或字符串
-     * @returns Promise<void>
-     */
-    static async setItem<T>(name: string, data: T): Promise<void> {
-        try {
-            const value = typeof data === 'string' ? data : JSON.stringify(data);
-            await EncryptedStorage.setItem(name, value);
-        } catch (error) {
-            console.error(`[EncryptedStorage] Failed to store data for key "${name}":`, error);
-            throw error;
-        }
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//
+// // 存储数据函数
+export const storeData = async <T>(key: string, data: T): Promise<void> => {
+    try {
+        const jsonData = JSON.stringify(data);
+        await AsyncStorage.setItem(key, jsonData);
+        // console.log(`${key} stored successfully.`);
+    } catch (error) {
+        console.error(`Failed to store ${key}:`, error);
     }
+};
+//
+// 获取数据函数
+export const getData = async <T>(key: string): Promise<T | null> => {
 
-    /**
-     * 获取数据
-     * @param name 存储的键名
-     * @returns Promise<T | null>
-     */
-    static async getItem<T>(name: string): Promise<T | null> {
-        try {
-            const value = await EncryptedStorage.getItem(name);
-            if (value) {
-                return JSON.parse(value) as T;
-            } else {
-                return null;
-            }
-        } catch (error) {
-            console.error(`[EncryptedStorage] Failed to retrieve data for key "${name}":`, error);
-            throw error;
+    try {
+        const jsonData = await AsyncStorage.getItem(key);
+        if (jsonData) {
+            return JSON.parse(jsonData) as T;
+        } else {
+            console.log(`${key} not found.`);
+            return null;
         }
+    } catch (error) {
+        console.error(`Failed to retrieve ${key}:`, error);
+        return null;
     }
+};
 
-    /**
-     * 删除数据
-     * @param name 存储的键名
-     * @returns Promise<void>
-     */
-    static async removeItem(name: string): Promise<void> {
-        try {
-            await EncryptedStorage.removeItem(name);
-        } catch (error) {
-            console.error(`[EncryptedStorage] Failed to remove data for key "${name}":`, error);
-            throw error;
-        }
+// 删除数据函数
+export const removeData = async (key: string): Promise<void> => {
+    try {
+        await AsyncStorage.removeItem(key);
+        console.log(`${key} removed successfully.`);
+    } catch (error) {
+        console.error(`Failed to remove ${key}:`, error);
     }
-
-    /**
-     * 清除所有数据
-     * @returns Promise<void>
-     */
-    static async clearAll(): Promise<void> {
-        try {
-            await EncryptedStorage.clear();
-        } catch (error) {
-            console.error(`[EncryptedStorage] Failed to clear all data:`, error);
-            throw error;
-        }
-    }
-}
+};
