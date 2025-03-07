@@ -1,4 +1,4 @@
-import React, {useMemo, useState, useRef, ReactHTML, ReactDOM} from "react";
+import React, {useMemo, useState, useRef, ReactHTML, ReactDOM , useEffect} from "react";
 import { Button , AirbnbRating , Tab , TabView } from "@rneui/themed";
 import {
     View,
@@ -198,34 +198,32 @@ const styles = StyleSheet.create({
 })
 
 const htmlContent = `<p style="text-align: center;"><img src="https://cdn.toodudu.com/2020/10/26/5rfNTc31IXdz8715LOI69kHBQCge6cP3z9i6B1Kc.png"></p><p style="text-align: center;"><img src="https://cdn.toodudu.com/2020/10/26/MGfeF5UvCzXnLvjFe1p8USrwPKdVCvcLXg0mxCNe.png"></p><p style="text-align: center;"><img src="https://cdn.toodudu.com/2020/10/26/TNIdK3b2gQUxTChi81G8A7YZuu2N79HnndAytRVR.png"></p><p style="text-align: center;"><img src="https://cdn.toodudu.com/2020/10/26/tvrRylqLpDGNYZZSI5Gj70a8fv8fh2tOlVDWnO7T.png"></p><p style="text-align: center;"><img src="https://cdn.toodudu.com/2020/10/26/ZNCJChoHwjwtsEcfHzxupBJJEteq0OeoweWKj9oc.png"></p><p style="text-align: center;"><img src="https://cdn.toodudu.com/2020/10/26/JSPjkMdXkJYOnvrJdBUympLhj1K4OdUFb36PelI4.png"></p>`;
-
+const goodsArr = [
+    {
+        name:'钛海THR-218钛白粉 金红石型二氧化钛 高白度易分散通用型钛白粉',
+        picture:'https://cdn.toodudu.com/2023/07/19/Fo6B3WrT90kmkEgygD6Hk01FIIIt65XVNs11iVwf.jpg',
+        price:'20.01'
+    },
+    {
+        name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
+        picture:'https://cdn.toodudu.com/2021/05/10/4Op4H3X5PkMp6ZnADltF86NpRhVAAdRhzuuTOFfg.jpeg',
+        price:'50.01'
+    },
+    {
+        name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
+        picture:'https://cdn.toodudu.com/2019/11/26/4bniUERisINvutrYbmCVND9CC8s2ywSCag07i2Mr.jpeg',
+        price:'30.01'
+    },
+    {
+        name:'南钛NR-950金红石型钛白粉 通用型二氧化钛 高遮盖高白度高耐候性钛白粉 南京生产',
+        picture:'https://cdn.toodudu.com/2021/05/11/QRR0kUQs3y7oPqqKpIURHQHPqR9zPFb30hBwBM3Q.jpeg',
+        price:'10.01'
+    },
+]
 const Good = ({navigation}:{navigation:RootStackNavigation}) => {
     const insets = useSafeAreaInsets();
     const windowWidth = useWindowDimensions().width;
-    const goodsArr = useMemo(() => (
-            [
-                {
-                    name:'钛海THR-218钛白粉 金红石型二氧化钛 高白度易分散通用型钛白粉',
-                    picture:'https://cdn.toodudu.com/2023/07/19/Fo6B3WrT90kmkEgygD6Hk01FIIIt65XVNs11iVwf.jpg',
-                    price:'20.01'
-                },
-                {
-                    name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
-                    picture:'https://cdn.toodudu.com/2021/05/10/4Op4H3X5PkMp6ZnADltF86NpRhVAAdRhzuuTOFfg.jpeg',
-                    price:'50.01'
-                },
-                {
-                    name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
-                    picture:'https://cdn.toodudu.com/2019/11/26/4bniUERisINvutrYbmCVND9CC8s2ywSCag07i2Mr.jpeg',
-                    price:'30.01'
-                },
-                {
-                    name:'南钛NR-950金红石型钛白粉 通用型二氧化钛 高遮盖高白度高耐候性钛白粉 南京生产',
-                    picture:'https://cdn.toodudu.com/2021/05/11/QRR0kUQs3y7oPqqKpIURHQHPqR9zPFb30hBwBM3Q.jpeg',
-                    price:'10.01'
-                },
-            ]
-    ), []);
+
     const [opacity, setOpacity] = useState<number>(0);
     const [TabIndex, setTabIndex] = useState(0);
 
@@ -280,9 +278,14 @@ const Good = ({navigation}:{navigation:RootStackNavigation}) => {
         setTabIndex(e)
     }
 
+    useEffect(() => {
+        scrollRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+    }, []);
+
+
     return (
             <View style={[styles.container]}>
-                <SafeAreaView style={{backgroundColor: `rgba(255, 255, 255, ${opacity > 0.1 ? opacity : 0})`,position:'absolute',top:0,left:0,right:0,zIndex:9}}>
+                <View style={{backgroundColor: `rgba(255, 255, 255, ${opacity > 0.1 ? opacity : 0})`,position:'absolute',top:0,left:0,right:0,zIndex:9,paddingTop:insets.top}}>
                     <View style={[defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,defaultStyled.fd_row,styles.firstBar]}>
                         <TouchableOpacity onPress={navigation.goBack}>
                             <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{backgroundColor: opacity?`transparent`:'rgba(148,147,147,.6)'} ]}>
@@ -299,26 +302,13 @@ const Good = ({navigation}:{navigation:RootStackNavigation}) => {
                             </Tab>
                         </View>
                         <TouchableOpacity onPress={navigation.goBack}>
-                            <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{backgroundColor: opacity?`transparent`:'rgba(148,147,147,.6)'} ]}>
+                            <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{backgroundColor: opacity?`rgba(255, 255, 255, ${opacity > 0.1 ? opacity : 0})`:'rgba(148,147,147,.6)'} ]}>
                                 <Icon name='share-alt' style={[styles.circleFuncIcon,{color: opacity?'#333':'#fff'}]} />
                             </View>
                         </TouchableOpacity>
                     </View>
-                </SafeAreaView>
-                {/*<View style={[defaultStyled.flex,defaultStyled.jc_bt,defaultStyled.fd_row,styles.floatButton,{top: insets.top + 15}]}>*/}
-                {/*    <TouchableOpacity onPress={navigation.goBack}>*/}
-                {/*        <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,opacity?styles.circleFuncOpactiy : null ]}>*/}
-                {/*            <Icon name='arrow-left' size={17} style={[styles.circleFuncIcon,opacity?styles.circleFuncIconColor:null]} />*/}
-                {/*        </View>*/}
-                {/*    </TouchableOpacity>*/}
-                {/*    <TouchableOpacity onPress={navigation.goBack}>*/}
-                {/*        <View style={[styles.circleFunc,defaultStyled.flex,defaultStyled.jc_ct,defaultStyled.ai_ct,{marginRight:7.5},opacity ? styles.circleFuncOpactiy : null]}>*/}
-                {/*            <Icon name='share-alt' size={17} style={[styles.circleFuncIcon,opacity ? styles.circleFuncIconColor : null]} />*/}
-                {/*        </View>*/}
-                {/*    </TouchableOpacity>*/}
-                {/*</View>*/}
-
-                <ScrollView onScroll={handleScroll} scrollEventThrottle={120} ref={scrollRef} style={[defaultStyled.flex,defaultStyled.fd_column,{marginBottom:insets.bottom}]}>
+                </View>
+                <ScrollView scrollIndicatorInsets={{ right: 1 }} horizontal={false} automaticallyAdjustContentInsets={false} onScroll={handleScroll} scrollEventThrottle={120} ref={scrollRef} style={[defaultStyled.flex,defaultStyled.fd_column,{marginBottom:insets.bottom}]}>
                     <View ref={sectionRefs[0]}>
                         <View style={styles.goodPicture}>
                             <Swiper dot={

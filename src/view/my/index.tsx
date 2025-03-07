@@ -4,26 +4,31 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import { Button , Badge , Divider } from '@rneui/base';
 import Swiper from 'react-native-swiper';
 import Recommend from "@/component/recommend";
-import {MainTabProps, RootStackNavigation} from "@/router/NestingNavigators";
+import {RootStackNavigation} from "@/types/navigation";
+
 
 
 let goodsArr = [
     {
+        id:1,
         name:'钛海THR-218钛白粉 金红石型二氧化钛 高白度易分散通用型钛白粉',
         picture:'https://cdn.toodudu.com/2023/07/19/Fo6B3WrT90kmkEgygD6Hk01FIIIt65XVNs11iVwf.jpg',
         price:'20.01'
     },
     {
+        id:2,
         name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
         picture:'https://cdn.toodudu.com/2021/05/10/4Op4H3X5PkMp6ZnADltF86NpRhVAAdRhzuuTOFfg.jpeg',
         price:'50.01'
     },
     {
+        id:3,
         name:'工厂整车（20-32吨）汽运直发全国包邮，工厂整车（54吨）铁路直发至站点，工厂整柜（27吨）海运直发沿海区域，其他仓库运费另计',
         picture:'https://cdn.toodudu.com/2019/11/26/4bniUERisINvutrYbmCVND9CC8s2ywSCag07i2Mr.jpeg',
         price:'30.01'
     },
     {
+        id:4,
         name:'南钛NR-950金红石型钛白粉 通用型二氧化钛 高遮盖高白度高耐候性钛白粉 南京生产',
         picture:'https://cdn.toodudu.com/2021/05/11/QRR0kUQs3y7oPqqKpIURHQHPqR9zPFb30hBwBM3Q.jpeg',
         price:'10.01'

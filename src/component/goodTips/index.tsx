@@ -7,7 +7,7 @@ export default memo(({name,colors,width=50,style}:{
     name:string;
     colors:string[];
     width:number;
-    style:StyleProp<ViewStyle> | undefined;
+    style?:StyleProp<ViewStyle> | undefined;
 }) => {
     return (
         <LinearGradient

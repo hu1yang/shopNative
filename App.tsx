@@ -13,6 +13,7 @@ import {getData} from "@/util/storage";
 import {IUserInfo} from "@/types/user";
 import {setUser} from "@/store/actions/user";
 import { ActivityIndicator, View, Text } from 'react-native';  // 引入 ActivityIndicator
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 
 
@@ -48,9 +49,12 @@ const App = (): React.JSX.Element => {
         );
     }
     return (
-        <Provider store={store}>
-            <NestingNavigators />
-        </Provider>
+        <KeyboardProvider>
+            <Provider store={store}>
+                <NestingNavigators />
+            </Provider>
+        </KeyboardProvider>
+
     );
 }
 

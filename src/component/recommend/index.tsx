@@ -43,7 +43,7 @@ const Recommend = memo(({goods,load,centerTitle = false}:Iprops) => {
             <View style={[styled.goodsBox,defaultStyled.flex,defaultStyled.flex_wrap,defaultStyled.fd_row,defaultStyled.jc_bt]}>
                 {
                     goods.map((item,index) => (
-                        <Good key={index} good={item} style={{ marginBottom: 10 }} />
+                        <Good key={item.id} good={item} style={{ marginBottom: 10 }} />
                     ))
                 }
             </View>

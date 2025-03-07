@@ -1,8 +1,10 @@
-import {StyleSheet, View , Image , Text} from 'react-native'
+import {StyleSheet, View , Image , Text , TouchableOpacity} from 'react-native'
 import defaultStyled from "@/assets/defaultStyled";
 import Price from "@/component/price";
 import GoodTips from "@/component/goodTips";
 import React from "react";
+import {useNavigation} from "@react-navigation/native";
+import {RootStackNavigation} from "@/types/navigation";
 
 let styled = StyleSheet.create({
     good:{
@@ -34,31 +36,37 @@ let styled = StyleSheet.create({
         borderRadius:2
     }
 })
-const Good = ({good,style}:any) => {
+const Good = React.memo(({good,style}:any) => {
+    const navigation:RootStackNavigation = useNavigation()
     return (
-        <View style={[style,styled.good]}>
-            <View style={styled.goodPicture}>
-                <Image resizeMode='stretch' style={{flex:1}} source={{uri:good.picture}} />
-            </View>
-            <View style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.jc_bt,styled.goodDetail]}>
-                <View style={[styled.goodMame]}>
-                    <Text  numberOfLines={2} ellipsizeMode="tail" style={{fontSize:13,fontWeight:'400',color:'rgba(51, 51, 51, 1)'}}>
-                        <GoodTips name='多多超市' colors={['rgba(250, 95, 95, 1)', 'rgba(247, 17, 17, 1)']} width={50} />
-                        {good.name}
-                    </Text>
+        <TouchableOpacity style={[style,styled.good]} activeOpacity={0.7} onPress={() => navigation.navigate('Good',{
+            id:1
+        })}>
+            <View style={{width:'100%',height:'100%'}}>
+                <View style={styled.goodPicture}>
+                    <Image resizeMode='stretch' style={{flex:1}} source={{uri:good.picture}} />
                 </View>
-                <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct,styled.goodBottom]}>
-                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_bl]}>
-                        <Price defaultn={1000} floatn='03' />
-                        <Text style={{fontSize:12,fontWeight:'400',color:'rgba(51, 51, 51, 1)'}}>/吨</Text>
+                <View style={[defaultStyled.flex,defaultStyled.fd_column,defaultStyled.jc_bt,styled.goodDetail]}>
+                    <View style={[styled.goodMame]}>
+                        <Text  numberOfLines={2} ellipsizeMode="tail" style={{fontSize:13,fontWeight:'400',color:'rgba(51, 51, 51, 1)'}}>
+                            <GoodTips name='多多超市' colors={['rgba(250, 95, 95, 1)', 'rgba(247, 17, 17, 1)']} width={50} />
+                            {good.name}
+                        </Text>
                     </View>
-                    <View style={styled.goodType}>
-                        <Text style={{fontSize:10,fontWeight:'400',color:'#FF8F1F'}}>期货</Text>
+                    <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.jc_bt,defaultStyled.ai_ct,styled.goodBottom]}>
+                        <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_bl]}>
+                            <Price defaultn={1000} floatn='03' />
+                            <Text style={{fontSize:12,fontWeight:'400',color:'rgba(51, 51, 51, 1)'}}>/吨</Text>
+                        </View>
+                        <View style={styled.goodType}>
+                            <Text style={{fontSize:10,fontWeight:'400',color:'#FF8F1F'}}>期货</Text>
+                        </View>
                     </View>
                 </View>
             </View>
-        </View>
+        </TouchableOpacity>
+
     )
-}
+})
 
 export default Good
