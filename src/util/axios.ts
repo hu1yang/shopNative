@@ -55,7 +55,6 @@ instance.interceptors.request.use(
             // loading start
         }
         const token = await getData<string|null|undefined>('token');
-        console.log(token)
         config.headers['Access-Token'] = token ? token : '';
         const date = new Date().valueOf(); // 时间戳
         if (config.method === 'post') {

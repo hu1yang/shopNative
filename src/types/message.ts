@@ -5,12 +5,13 @@ export type optionMessageProp = {
     message: any,
     type: number,
     roomId: number,
-    sendInfo:IUserInfo,
-    sendUser: string,
+    sendInfo :IUserInfo,
+    sendUser?: string,
     sendUserId: number,
     createBy?: number,
     status?: number,
     messageToken?: string,
+    timestamp: number,
 }
 
 

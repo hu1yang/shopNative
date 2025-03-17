@@ -82,7 +82,7 @@ const Tabbar: React.FC<StackScreenProps<RootStackParamList, 'Tabbar'>> = ({navig
 const NestingNavigators = (): JSX.Element => (
         <NavigationContainer>
             <Stack.Navigator>
-                <Stack.Screen name="Chat" options={{title: 'chat',}} component={Chat}/>
+
                 <Stack.Screen name="Tabbar" options={{title: "", headerShown: false}} component={Tabbar}/>
                 <Stack.Screen name="Login" options={{
                     title: 'login',
@@ -97,6 +97,7 @@ const NestingNavigators = (): JSX.Element => (
                     headerMode: 'float',
                     headerTitleAlign: 'left'
                 }} component={Good}/>
+                <Stack.Screen name="Chat" options={{title: 'chat',}} component={Chat}/>
 
             </Stack.Navigator>
             <Toast/>

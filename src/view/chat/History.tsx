@@ -2,39 +2,16 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, FlatList, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import {optionMessageProp} from "@/types/message";
 
-// 假设这是聊天数据的初始状态
-const initialMessages = [
-    { id: '1', text: 'Hello!', sender: 'User' },
-    { id: '2', text: 'Hi there!', sender: 'Friend' },
-    { id: '3', text: 'How are you?', sender: 'User' },
-    { id: '4', text: 'I\'m good, thanks!', sender: 'Friend' },
-];
 
-const History = ({messageList}:{messageList:optionMessageProp}) => {
-
+const Item = ({item}:{item:optionMessageProp}) => {
     return (
-        <>
-            <FlatList
-                data={messageList}
-                contentContainerStyle={styles.container}
-                renderItem={({ item }) => (
-                    <View key={item.createBy} style={[styles.messageContainer, item.sendInfo.id === 1 ? styles.userMessage : styles.friendMessage]}>
-                        <Text style={styles.messageText}>{item.message}</Text>
-                    </View>
-                )}
-                keyExtractor={(item) => item.id}
-                inverted // 反向显示消息（最新消息在底部）
-            />
-        </>
+        <View key={item.createBy} style={[styles.messageContainer, item.sendInfo.id === 1 ? styles.userMessage : styles.friendMessage]}>
+            <Text style={styles.messageText}>{item.message}</Text>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        justifyContent: 'flex-end',
-    },
     messageContainer: {
         maxWidth: '80%',
         padding: 10,
@@ -56,4 +33,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default History;
+export default Item;

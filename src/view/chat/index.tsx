@@ -1,5 +1,16 @@
 import React, {useState, useEffect, useRef} from "react";
-import {View, Text, TextInput, StyleSheet, Button, Alert, SafeAreaView, TouchableOpacity, Animated} from "react-native";
+import {
+    View,
+    Text,
+    TextInput,
+    StyleSheet,
+    Button,
+    Alert,
+    SafeAreaView,
+    TouchableOpacity,
+    Animated,
+    FlatList
+} from "react-native";
 import {MainTabProps} from "@/router/NestingNavigators";
 import {createMessage} from "@/util/message";
 import axios from "@/util/axios";
@@ -12,7 +23,7 @@ import {IUserInfo} from "@/types/user";
 import { useKeyboardAnimation } from "react-native-keyboard-controller";
 
 
-import History from './History'
+import Item from "./History";
 
 const styles = StyleSheet.create({
     container: {
@@ -47,14 +58,33 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
+    messageContainer:{
+        flexGrow: 1,
+        padding: 16,
+        justifyContent: 'flex-end',
+    }
 })
 const Chat = (props: MainTabProps<'Chat'>) => {
-    const [chat, setChat] = useState<string>('');
+    const navigation = props.navigation
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [chat, setChat] = useState<string>('hu1yang');
     const [roomId, setRoomId] = useState<number | null>(null);
     const [messageList, setMessageList] = useState<optionMessageProp[]>([]);
+    const [pageInfo, setPageInfo] = useState<{
+        page: number;
+        pageSize: number;
+    }>({
+        page: 1,
+        pageSize: 30,
+    });
+
     const socketRef = useRef<WebSocketClient | null>(null)
 
     const userInfo: IUserInfo | null = useSelector((state: RootState) => state.user.userInfo)
+
+    const { height, progress } = useKeyboardAnimation();
+
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -66,16 +96,74 @@ const Chat = (props: MainTabProps<'Chat'>) => {
 
         fetchUserInfo();
         return () => {
+            setMessageList([])
             socketRef.current?.disconnect()
             socketRef.current = null
             console.log('关闭socket')
         }
     }, [])
 
+    const getMessageList = (room_id: number) => {
+        setLoading(true)
+        axios.get<optionMessageProp[]>('/message/room/getMessageList', {roomId: room_id,...pageInfo}).then((res) => {
+            if (res.code === 200) {
+                if(res.data){
+                    setMessageList((prevList) => [...res.data! ,...prevList]);
+                    setTimeout(() => {
+                        setLoading(false)
+                    }, 500)
+                }
+            }else if (res.code === 403){
+                Toast.show({
+                    type: 'error',  // 可以选择不同的类型，如 success, error, info
+                    position: 'top',  // 默认从顶部显示
+                    text1: 'network code:' + res.code,
+                    text2: res.msg,
+                    visibilityTime: 3000,  // Toast显示时长
+                    topOffset: 150, // 控制顶部距离，修改此值调整 Toast 显示的高度
+                    text1Style: {
+                        fontSize: 14,
+                        color: '#333', // 自定义文字颜色
+                    },
+                    text2Style:{
+                        fontSize: 12,
+                        color: '#ccc', // 自定义文字颜色
+                    }
+                });
+                setTimeout(() => {
+                    navigation.navigate('Login')
+                },200)
+            }
+        }).catch((error) => {
+            console.log('error', error)
+        })
+    }
+
+    useEffect(() => {
+        getMessageList(props.route.params.roomId)
+        return () => {
+        };
+    }, [pageInfo]);
+
+
+    const scrollList = () => {
+        if(!loading){
+            setPageInfo(prevState => {
+                return {
+                    ...prevState,
+                    page: prevState.page + 1
+                }
+            })
+        }
+    }
+
     const checkRoom = (room_id: number) => {
         axios.get('/message/room/check', {roomId: room_id}).then((res) => {
             if (res.code === 200) {
-                !socketRef.current && clientSocket(room_id)
+              if(!socketRef.current){
+                getMessageList(room_id)
+                // clientSocket(room_id)
+              }
             } else {
                 Toast.show({
                     type: 'error',  // 可以选择不同的类型，如 success, error, info
@@ -163,32 +251,43 @@ const Chat = (props: MainTabProps<'Chat'>) => {
         if (!socketRef.current) return
         socketRef.current?.onMessage((option: optionMessageProp) => {
             console.log(option)
-            setMessageList((prevList) => [...prevList, {...option}]);
+            setMessageList((prevList) => [...prevList , { ...option }]);
         })
     }
     const sendMessage = () => {
-        if (!socketRef.current || !socketRef.current?.connected || !chat || !roomId) return
+        if (!userInfo || !socketRef.current || !socketRef.current?.connected || !chat || !roomId) return
         const option = createMessage({
             message: chat,
             type: 1,
             roomId,
-            sendInfo: userInfo
+            sendInfo: userInfo,
+            sendUser: userInfo.username,
+            sendUserId: userInfo.id,
         })
         socketRef.current?.sendMessage(option as optionMessageProp);
         setChat('');
     }
 
-    const { height, progress } = useKeyboardAnimation();
-    useEffect(() => {
-        console.log(height)
-
-    }, [height]);
 
     return (
         <View style={styles.container}>
             <Animated.View style={{flex: 1,transform: [{ translateY: height }]}}>
                 <SafeAreaView style={{flex: 1}}>
-                        <History messageList={messageList}/>
+                        <FlatList
+                            data={messageList}
+                            contentContainerStyle={styles.messageContainer}
+                            renderItem={({ item }:{item:optionMessageProp}) => <Item item={item} />}
+                            keyExtractor={(item:optionMessageProp,index:number) => item.id!.toString() + index.toString()}
+                            // inverted // 反向显示消息（最新消息在底部）
+                            initialScrollIndex={messageList.length && messageList.length - 1}
+                            getItemLayout={(data, index) => ({
+                                length: 60, // 假设每条消息大约 60px 高
+                                offset: 60 * index,
+                                index
+                            })}
+                            onStartReachedThreshold={0.5}
+                            onStartReached={scrollList}
+                        />
                         <View style={styles.inputContainer}>
                             <TextInput
                                     style={styles.textInput}

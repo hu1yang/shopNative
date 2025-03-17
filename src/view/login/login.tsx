@@ -163,6 +163,7 @@ const Login = ({navigation}:{
                     <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,styles.formItem]}>
                         <Icon name='user' size={16} style={{color: '#333',fontWeight:'600'}}></Icon>
                         <TextInput
+                            editable={true}
                             style={styles.inputStyle}
                             onChangeText={setUsername}
                             placeholder="请输入用户名"
@@ -173,6 +174,7 @@ const Login = ({navigation}:{
                     <View style={[defaultStyled.flex,defaultStyled.fd_row,defaultStyled.ai_ct,styles.formItem]}>
                         <Icon name='lock1' size={16} style={{color: '#333',fontWeight:'600'}}></Icon>
                         <TextInput
+                            editable={true}
                             style={styles.inputStyle}
                             onChangeText={setPassword}
                             placeholder="请输入密码"
